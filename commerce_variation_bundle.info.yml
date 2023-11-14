@@ -1,0 +1,8 @@
+name: 'Commerce Variation Bundle'
+type: module
+description: 'Provides a way to group multiple product variants into same'
+core_version_requirement: ^10
+package: 'Commerce (contrib)'
+dependencies:
+  - commerce:commerce
+  - commerce:commerce_cart

@@ -1,0 +1,69 @@
+<?php
+
+use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\commerce_variation_bundle\Entity\BundleItemType;
+use Drupal\commerce_variation_bundle\Entity\VariationBundle;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_entity_bundle_info_alter().
+ */
+function commerce_variation_bundle_entity_bundle_info_alter(array &$bundles): void {
+  $enabled_types = commerce_variation_bundle_enabled_types();
+
+  foreach ($bundles['commerce_product_variation'] as $type => $bundle) {
+    if (in_array($type, $enabled_types)) {
+      $bundles['commerce_product_variation'][$type]['class'] = VariationBundle::class;
+    }
+  }
+}
+
+/**
+ * Get list of product variation types with bundle option enabled.
+ *
+ * @return array
+ *   List of product variation types.
+ */
+function commerce_variation_bundle_enabled_types(): array {
+  $types = [];
+  $product_variation_types = ProductVariationType::loadMultiple();
+  foreach ($product_variation_types as $product_variation_type) {
+    if ($product_variation_type->hasTrait('purchasable_entity_variation_bundle')) {
+      $types[] = $product_variation_type->id();
+    }
+  }
+
+  return $types;
+}
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function commerce_variation_bundle_inline_entity_form_entity_form_alter(array &$entity_form, FormStateInterface &$form_state) {
+  if ($entity_form['#entity_type'] == 'commerce_bundle_item') {
+    $entity_bundle = $entity_form['#bundle'];
+    if ($bundle_item_type = BundleItemType::load($entity_bundle)) {
+      if ($bundle_item_type->shouldGenerateTitle()) {
+        $entity_form['title']['#access'] = FALSE;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ */
+function commerce_variation_bundle_inline_entity_form_table_fields_alter(array &$fields, array $context) {
+  if ($context['entity_type'] == 'commerce_bundle_item' && $context['field_name'] == 'bundle_items') {
+    $fields['quantity'] = [
+      'type' => 'field',
+      'label' => t('Quantity'),
+      'weight' => 10,
+    ];
+    $fields['price'] = [
+      'type' => 'field',
+      'label' => t('Price'),
+      'weight' => 10,
+    ];
+  }
+}

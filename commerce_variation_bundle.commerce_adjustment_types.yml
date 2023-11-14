@@ -1,0 +1,6 @@
+bundle_saving:
+  label: 'Bundle saving'
+  singular_label: 'bundle saving'
+  plural_label: 'bundle savings'
+  has_ui: true
+  weight: 10

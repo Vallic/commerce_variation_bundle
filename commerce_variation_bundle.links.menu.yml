@@ -1,0 +1,5 @@
+entity.commerce_bundle_item_type.collection:
+  title: 'Variation bundle types'
+  description: 'Manage variation bundle types and bundle items.'
+  parent: 'commerce_product.configuration'
+  route_name: entity.commerce_bundle_item_type.collection

@@ -1,0 +1,15 @@
+commerce_variation_bundle.commerce_bundle_item_type.*:
+  type: config_entity
+  label: 'Variation Bundle Item type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    generateTitle:
+      type: boolean
+      label: 'Generate bundle item titles based on product variation'

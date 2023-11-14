@@ -1,0 +1,14 @@
+services:
+  commerce_variation_bundle.order_processor:
+    class: Drupal\commerce_variation_bundle\VariationBundleOrderProcessor
+    tags:
+      - { name: commerce_order.order_processor, priority: 100, adjustment_type: bundle_saving }
+
+  commerce_variation_bundle.bundle_price_resolver:
+    class: Drupal\commerce_variation_bundle\Resolver\VariationBundlePriceResolver
+    tags:
+      - { name: commerce_price.price_resolver, priority: 1000 }
+
+  commerce_variation_bundle.bundle_splitter:
+    class: \Drupal\commerce_variation_bundle\VariationBundleSplitter
+    arguments: ['@entity_type.manager']

@@ -1,0 +1,11 @@
+commerce_bundle_item.type_add:
+  title: 'Add variation bundle item type'
+  route_name: entity.commerce_bundle_item_type.add_form
+  appears_on:
+    - entity.commerce_bundle_item_type.collection
+
+commerce_bundle_item.add_page:
+  title: 'Add variation bundle item'
+  route_name: entity.commerce_bundle_item.add_page
+  appears_on:
+    - entity.commerce_bundle_item.collection

@@ -1,0 +1,4 @@
+administer commerce_bundle_item_type:
+  title: 'Administer bundle item types'
+  description: 'Maintain the types of bundle item entity.'
+  restrict access: true
