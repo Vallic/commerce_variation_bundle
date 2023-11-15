@@ -98,7 +98,7 @@ class VariationBundleStockManager implements VariationBundleStockManagerInterfac
       }
 
       // TBD - unit cost, currency, zone.
-      $this->stockServiceManager->createTransaction($product_variation_bundle, $location->getId(), '', $total, 0.00, NULL, StockTransactionsInterface::STOCK_SALE);
+      $this->stockServiceManager->createTransaction($bundle_item_variation, $location->getId(), '', $total, 0.00, NULL, StockTransactionsInterface::STOCK_SALE);
     }
   }
 
