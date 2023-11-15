@@ -4,6 +4,43 @@ use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_variation_bundle\Entity\BundleItemType;
 use Drupal\commerce_variation_bundle\Entity\VariationBundle;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_variation_bundle_theme() {
+  return [
+    'commerce_bundle_item' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for bundle item templates.
+ *
+ * Default template: commerce-bundle-item.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing rendered fields.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_commerce_bundle_item(array &$variables) {
+  /** @var \Drupal\commerce_variation_bundle\Entity\BundleItemInterface $bundle_item */
+  $bundle_item = $variables['elements']['#commerce_bundle_item'];
+
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['bundle_item'] = $bundle_item;
+  // Helpful $content variable for templates.
+  $variables['content'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+
 
 /**
  * Implements hook_entity_bundle_info_alter().

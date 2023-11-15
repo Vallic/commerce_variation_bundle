@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ *
+ * Default theme implementation for bundle item.
+ *
+ * Available variables:
+ * - content: Items for the content of the bundle item.
+ *   @code
+ *   {{ content|without('title') }}
+ *   @endcode
+ * - attributes: HTML attributes for the wrapper.
+ * - view_mode: The bundle item view mode used.
+ * - bundle_item: The bundle item object.
+ *
+ * @ingroup themeable
+ */
+#}
+{%
+  set classes = [
+  view_mode ? 'bundle-item--view-mode--' ~ view_mode|clean_class,
+  'clearfix',
+]
+%}
+<div{{ attributes.addClass(classes) }}>
+  {{ content }}
+</div>

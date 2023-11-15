@@ -1,0 +1,4 @@
+services:
+  commerce_variation_bundle_stock.manager:
+    class: \Drupal\commerce_variation_bundle_stock\VariationBundleStockManager
+    arguments: ['@entity_type.manager', '@commerce_stock.service_manager']
