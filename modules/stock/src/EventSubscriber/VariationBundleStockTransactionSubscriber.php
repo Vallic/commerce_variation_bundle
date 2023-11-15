@@ -57,7 +57,6 @@ class VariationBundleStockTransactionSubscriber implements EventSubscriberInterf
   public function onTransactionInsert(LocalStockTransactionEvent $event) {
     $purchasable_entity = $event->getEntity();
     $quantity = $event->getQuantity();
-
     // If we deduct quantity either from bundle, we need reflect that on
     // child items. If we deduct/add from regular product variation,
     // we need to find out if there is bundle using it, and recalculate stock

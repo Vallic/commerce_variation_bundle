@@ -95,19 +95,19 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
     $order_items = [];
     $order_item_storage = $this->entityTypeManager->getStorage('commerce_order_item');
     $bundle_amounts = $this->split($order_item);
+    $order_item_quantity = $order_item->getQuantity();
 
     foreach ($bundle_amounts as $bundle_amount) {
-
-      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
-      $order_item = $order_item_storage->create([
+      $order_item_values = [
         'type' => $order_item->bundle(),
-        'quantity' => $bundle_amount->getQuantity() * $order_item->getQuantity(),
+        'quantity' => $bundle_amount->getQuantity() * $order_item_quantity,
         'title' => $bundle_amount->getVariation()->getTitle(),
         'unit_price' => $bundle_amount->getPrice(),
         'adjustments' => $bundle_amount->getAdjustments(),
-      ]);
-      $order_item->save();
-      $order_items[] = $order_item;
+      ];
+      $new_order_item = $order_item_storage->create($order_item_values);
+      $new_order_item->save();
+      $order_items[] = $new_order_item;
     }
 
     return $order_items;
