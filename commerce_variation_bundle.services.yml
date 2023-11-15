@@ -12,3 +12,9 @@ services:
   commerce_variation_bundle.bundle_splitter:
     class: \Drupal\commerce_variation_bundle\VariationBundleSplitter
     arguments: ['@entity_type.manager']
+
+  commerce_variation_bundle.order_subscriber:
+    class: Drupal\commerce_variation_bundle\EventSubscriber\OrderVariationBundleSubscriber
+    arguments: ['@commerce_variation_bundle.bundle_splitter']
+    tags:
+      - { name: event_subscriber }
