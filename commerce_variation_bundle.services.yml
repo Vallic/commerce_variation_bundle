@@ -18,4 +18,3 @@ services:
     arguments: ['@commerce_variation_bundle.bundle_splitter']
     tags:
       - { name: event_subscriber }
-      - { name: needs_destruction }
