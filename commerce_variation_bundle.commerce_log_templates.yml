@@ -1,0 +1,5 @@
+variation_bundle_split:
+  category: commerce_order
+  label: 'Bundle split'
+  template: '<p>The bundle <em>{{ variation_bundle_label }}</em> is split into separate order items.</p>'
+

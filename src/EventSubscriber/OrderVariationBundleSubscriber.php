@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_variation_bundle\EventSubscriber;
 
+use Drupal\commerce_log\Entity\Log;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
 use Drupal\commerce_variation_bundle\VariationBundleSplitterInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
@@ -60,6 +61,15 @@ class OrderVariationBundleSubscriber implements EventSubscriberInterface {
         foreach ($this->bundleSplitter->createOrderItems($order_item) as $item) {
           $order->addItem($item);
         }
+
+        // Write an log entry.
+        Log::create([
+          'category_id' => 'commerce_order',
+          'template_id' => 'variation_bundle_split',
+          'source_entity_id' => $order->id(),
+          'source_entity_type' => 'commerce_order',
+          'params' => ['variation_bundle_label' => $purchased_entity->label()],
+        ])->save();
       }
     }
   }
