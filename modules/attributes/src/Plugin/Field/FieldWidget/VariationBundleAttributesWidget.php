@@ -222,7 +222,6 @@ class VariationBundleAttributesWidget extends ProductVariationAttributesWidget i
       ];
     }
 
-
     return $output;
   }
 

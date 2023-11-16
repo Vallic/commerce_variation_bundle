@@ -194,6 +194,7 @@ class BundleItem extends CommerceContentEntityBase implements BundleItemInterfac
       ->setRequired(TRUE)
       ->setSetting('target_type', 'commerce_product_variation')
       ->setSetting('handler', 'default')
+      ->addConstraint('DisallowVariationBundle')
       ->setDisplayOptions('form', [
         'type' => 'commerce_entity_select',
         'weight' => 0,
