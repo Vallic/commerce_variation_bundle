@@ -25,9 +25,12 @@ class ProductVariationBundleAttributeMapper extends ProductVariationAttributeMap
         return parent::selectVariation($variations, $attribute_values);
       }
       else {
+        $valid_attributes = array_filter($attribute_values, function ($item) {
+          return !empty($item);
+        });
         $existing_attributes = $this->collectAttributes($variation);
         $match = 0;
-        foreach ($attribute_values as $type => $attribute_value) {
+        foreach ($valid_attributes as $type => $attribute_value) {
           if (!isset($existing_attributes[$type]) || empty($attribute_value)) {
             continue;
           }
@@ -37,8 +40,9 @@ class ProductVariationBundleAttributeMapper extends ProductVariationAttributeMap
           }
         }
 
-        if (count($existing_attributes) === $match) {
+        if (count($existing_attributes) === $match + 1 && count($valid_attributes) === $match + 1) {
           $selected_variation = $variation;
+          break;
         }
       }
     }
