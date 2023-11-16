@@ -1,0 +1,4 @@
+services:
+  commerce_variation_bundle_attributes.variation_attribute_mapper:
+    class: Drupal\commerce_variation_bundle_attributes\ProductVariationBundleAttributeMapper
+    arguments: ['@commerce_product.attribute_field_manager', '@entity_type.manager', '@entity.repository']
