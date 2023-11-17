@@ -8,3 +8,8 @@ services:
     tags:
       - { name: event_subscriber }
       - { name: needs_destruction }
+  commerce_variation_bundle_stock.product_variation:
+    class: Drupal\commerce_variation_bundle_stock\EventSubscriber\ProductVariationSubscriber
+    arguments: ['@commerce_variation_bundle_stock.manager']
+    tags:
+      - { name: event_subscriber }
