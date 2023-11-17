@@ -40,7 +40,7 @@ class ProductVariationBundleAttributeMapper extends ProductVariationAttributeMap
           }
         }
 
-        if (count($existing_attributes) === $match + 1 && count($valid_attributes) === $match + 1) {
+        if (count($existing_attributes) === $match && count($valid_attributes) === $match) {
           $selected_variation = $variation;
           break;
         }
