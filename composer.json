@@ -1,0 +1,16 @@
+{
+  "name": "drupal/commerce_variation_bundle",
+  "type": "drupal-module",
+  "description": "Provides a way to group multiple product variants into same",
+  "keywords": ["Drupal", "Drupal Commerce"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/commerce_variation_bundle",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "http://drupal.org/project/issues/commerce_variation_bundle",
+    "source": "http://cgit.drupalcode.org/commerce_variation_bundle"
+  },
+  "require": {
+    "drupal/commerce": "~2.0"
+  }
+}
