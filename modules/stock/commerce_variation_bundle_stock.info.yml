@@ -5,4 +5,4 @@ core_version_requirement: ^10
 package: 'Commerce (contrib)'
 dependencies:
   - commerce_variation_bundle:commerce_variation_bundle
-  - commerce_stock_local:commerce_stock_local
+  - commerce_stock:commerce_stock_local
