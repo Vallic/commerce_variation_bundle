@@ -65,28 +65,16 @@ class VariationBundleAttributesWidget extends ProductVariationAttributesWidget i
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
 
-    // If we have no bundle variation, render normal widget.
-    if (!$this->isBundleActive($product->getDefaultVariation())) {
-      return parent::formElement($items, $delta, $element, $form, $form_state);
-    }
-
-    // If we have normal attributes on use on bundle variation,
-    // use default widget.
-    if (!empty($product->getDefaultVariation()->getAttributeValues())) {
-      return parent::formElement($items, $delta, $element, $form, $form_state);
-    }
-
     $variations = $this->loadEnabledVariations($product);
-    if (count($variations) === 0) {
-      // Nothing to purchase, tell the parent form to hide itself.
-      $form_state->set('hide_form', TRUE);
-      $element['variation'] = [
-        '#type' => 'value',
-        '#value' => 0,
-      ];
-      return $element;
+
+    // If we have any non-bundle variations, just use regular widget.
+    // If we have bundle variations which uses regular attributes,
+    // use Commerce core widget.
+    if ($this->useDefaultAttributes($variations)) {
+      return parent::formElement($items, $delta, $element, $form, $form_state);
     }
-    elseif (count($variations) === 1) {
+
+    if (count($variations) === 1) {
       /** @var \Drupal\commerce_product\Entity\ProductVariationInterface $selected_variation */
       $selected_variation = reset($variations);
       // If there is 1 variation but there are attribute fields, then the
@@ -194,19 +182,15 @@ class VariationBundleAttributesWidget extends ProductVariationAttributesWidget i
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $product = $form_state->get('product');
+    $variations = $this->loadEnabledVariations($product);
+    // If we have any non-bundle variations, just use regular widget.
+    // If we have bundle variations which uses regular attributes,
+    // use Commerce core widget.
+    if ($this->useDefaultAttributes($variations)) {
+      return parent::massageFormValues($values, $form, $form_state);
+    }
+
     $default_variation = $product->getDefaultVariation();
-    // If we have no bundle variation, render normal widget.
-    if (!$this->isBundleActive($default_variation)) {
-      return parent::massageFormValues($values, $form, $form_state);
-    }
-
-    // If we have normal attributes on use on bundle variation,
-    // use default widget.
-    if (!empty($default_variation->getAttributeValues())) {
-      return parent::massageFormValues($values, $form, $form_state);
-    }
-
-    $variations = $this->variationStorage->loadEnabled($product);
 
     $output = [];
     foreach ($values as &$value) {

@@ -26,4 +26,33 @@ trait VariationBundleTrait {
     return FALSE;
   }
 
+  /**
+   * Determine what attributes variations should use.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
+   *   The variations
+   *
+   * @return bool
+   *   True if we need to use default attributes.
+   */
+  public function useDefaultAttributes(array $variations): bool {
+    if (count($variations) === 0) {
+      return TRUE;
+    }
+    foreach ($variations as $variation) {
+      // If we have no bundle variation, render normal widget.
+      if (!$this->isBundleActive($variation)) {
+        return TRUE;
+      }
+
+      // If we have normal attributes on use on bundle variation,
+      // use default widget.
+      if (!empty($variation->getAttributeValues())) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
 }
