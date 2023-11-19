@@ -32,10 +32,10 @@ interface BundleItemInterface extends ContentEntityInterface, EntityOwnerInterfa
   /**
    * Gets the bundle item title.
    *
-   * @return string
+   * @return string|null
    *   The bundle item title
    */
-  public function getTitle(): string;
+  public function getTitle(): string|null;
 
   /**
    * Sets the bundle item title.

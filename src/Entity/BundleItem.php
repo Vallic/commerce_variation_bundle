@@ -124,7 +124,7 @@ class BundleItem extends CommerceContentEntityBase implements BundleItemInterfac
   /**
    * {@inheritdoc}
    */
-  public function getTitle(): string {
+  public function getTitle(): string|null {
     return $this->get('title')->value;
   }
 
