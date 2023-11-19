@@ -29,6 +29,8 @@ use Drupal\user\EntityOwnerTrait;
  *   handlers = {
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "list_builder" = "Drupal\commerce_variation_bundle\BundleItemListBuilder",
+ *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
+ *     "access" = "Drupal\commerce_variation_bundle\BundleItemAccessControlHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_variation_bundle\Form\BundleItemForm",
  *       "edit" = "Drupal\commerce_variation_bundle\Form\BundleItemForm",
