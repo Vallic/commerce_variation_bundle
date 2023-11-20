@@ -15,7 +15,7 @@ class VariationBundle extends ProductVariation implements VariationBundleInterfa
    * {@inheritdoc}
    */
   public function getBundleItems() {
-    return $this->get('bundle_items')->referencedEntities();
+    return $this->getTranslatedReferencedEntities('bundle_items');
   }
 
   /**

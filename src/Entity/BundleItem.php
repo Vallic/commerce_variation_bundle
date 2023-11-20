@@ -10,7 +10,9 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Url;
 use Drupal\user\EntityOwnerTrait;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Defines the variation bundle item entity class.
@@ -31,6 +33,7 @@ use Drupal\user\EntityOwnerTrait;
  *     "list_builder" = "Drupal\commerce_variation_bundle\BundleItemListBuilder",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "access" = "Drupal\commerce_variation_bundle\BundleItemAccessControlHandler",
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
  *     "form" = {
  *       "add" = "Drupal\commerce_variation_bundle\Form\BundleItemForm",
  *       "edit" = "Drupal\commerce_variation_bundle\Form\BundleItemForm",
@@ -46,6 +49,11 @@ use Drupal\user\EntityOwnerTrait;
  *   base_table = "commerce_bundle_item",
  *   data_table = "commerce_bundle_item_field_data",
  *   translatable = TRUE,
+ *   translation = {
+ *     "content_translation" = {
+ *       "access_callback" = "content_translation_translate_access"
+ *     },
+ *   },
  *   admin_permission = "administer commerce_product",
  *   entity_keys = {
  *     "id" = "id",
@@ -61,6 +69,10 @@ use Drupal\user\EntityOwnerTrait;
  *     "add-page" = "/admin/commerce/config/bundle-types/add-item",
  *     "edit-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/edit",
  *     "delete-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/delete",
+ *     "drupal:content-translation-overview" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations",
+ *     "drupal:content-translation-add" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/add/{source}/{target}",
+ *     "drupal:content-translation-edit" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/edit/{language}",
+ *     "drupal:content-translation-delete" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/delete/{language}",
  *   },
  *   bundle_entity_type = "commerce_bundle_item_type",
  *   field_ui_base_route = "entity.commerce_bundle_item_type.edit_form",
@@ -83,6 +95,16 @@ class BundleItem extends CommerceContentEntityBase implements BundleItemInterfac
   /**
    * {@inheritdoc}
    */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    if ($rel == 'canonical') {
+      $rel = 'edit-form';
+    }
+    return parent::toUrl($rel, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
     if (!$this->getOwnerId()) {
@@ -95,9 +117,6 @@ class BundleItem extends CommerceContentEntityBase implements BundleItemInterfac
       ->getStorage('commerce_bundle_item_type')
       ->load($this->bundle());
 
-    // Variation 'bundle' can be 'commerce_product_variation' in some cases:
-    // Migration stub entities in sub processes, tests. In that case, this
-    // variable will be NULL.
     // @see https://www.drupal.org/project/commerce/issues/3342331
     if (!$bundle_item_type instanceof BundleItemTypeInterface) {
       return;

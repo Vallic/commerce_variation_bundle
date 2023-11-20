@@ -10,7 +10,7 @@ services:
       - { name: commerce_price.price_resolver, priority: 1000 }
 
   commerce_variation_bundle.bundle_splitter:
-    class: \Drupal\commerce_variation_bundle\VariationBundleSplitter
+    class: Drupal\commerce_variation_bundle\VariationBundleSplitter
     arguments: ['@entity_type.manager']
 
   commerce_variation_bundle.order_subscriber:
