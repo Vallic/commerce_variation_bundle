@@ -100,6 +100,7 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
     foreach ($bundle_amounts as $bundle_amount) {
       $order_item_values = [
         'type' => $order_item->bundle(),
+        'purchased_entity' => $bundle_amount->getVariation(),
         'quantity' => $bundle_amount->getQuantity() * $order_item_quantity,
         'title' => $bundle_amount->getVariation()->getTitle(),
         'unit_price' => $bundle_amount->getPrice(),
