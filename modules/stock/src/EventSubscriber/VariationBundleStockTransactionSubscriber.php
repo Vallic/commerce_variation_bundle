@@ -25,11 +25,6 @@ class VariationBundleStockTransactionSubscriber implements EventSubscriberInterf
   protected array $variationBundles = [];
 
   /**
-   * List of product variations.
-   */
-  protected array $productVariations = [];
-
-  /**
    * Constructs a CommerceStockTransactionSubscriber.
    *
    * @param \Drupal\commerce_variation_bundle_stock\VariationBundleStockManagerInterface $stock_manager
@@ -62,12 +57,11 @@ class VariationBundleStockTransactionSubscriber implements EventSubscriberInterf
     // we need to find out if there is bundle using it, and recalculate stock
     // for them.
     if ($purchasable_entity instanceof VariationBundleInterface) {
-      if ($quantity < 0) {
-        $this->variationBundles[] = ['entity' => $purchasable_entity, 'quantity' => $quantity];
+      if (!$purchasable_entity->shouldBundleSplit()) {
+        if ($quantity < 0) {
+          $this->variationBundles[] = ['entity' => $purchasable_entity, 'quantity' => $quantity];
+        }
       }
-    }
-    else {
-      $this->productVariations[] = $purchasable_entity->id();
     }
   }
 
@@ -77,10 +71,6 @@ class VariationBundleStockTransactionSubscriber implements EventSubscriberInterf
   public function destruct() {
     foreach ($this->variationBundles as $item) {
       $this->stockManager->withdrawStock($item['entity'], $item['quantity']);
-    }
-
-    foreach ($this->productVariations as $variation_id) {
-      $this->stockManager->checkBundleStock($variation_id);
     }
   }
 
