@@ -49,9 +49,9 @@ class VariationBundleStockManager implements VariationBundleStockManagerInterfac
     }
     $stock = $this->stockServiceManager->getStockLevel($product_variation_bundle);
     $updated = $this->recalculateStock($product_variation_bundle);
-    $difference = $updated > $stock ? $updated - $stock : $stock - $updated;
+    $difference = $updated - $stock;
 
-    if ($difference !== 0) {
+    if (!empty($difference)) {
       $location = $this->stockServiceManager->getTransactionLocation($this->getContext($product_variation_bundle), $product_variation_bundle, $updated);
       if (empty($location)) {
         // If we have no location, something isn't properly configured.

@@ -4,9 +4,11 @@ namespace Drupal\commerce_variation_bundle_stock\EventSubscriber;
 
 use Drupal\commerce_stock_local\Event\LocalStockTransactionEvent;
 use Drupal\commerce_stock_local\Event\LocalStockTransactionEvents;
+use Drupal\commerce_variation_bundle\Entity\VariationBundle;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
 use Drupal\commerce_variation_bundle_stock\VariationBundleStockManagerInterface;
 use Drupal\Core\DestructableInterface;
+use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -40,6 +42,8 @@ class VariationBundleStockTransactionSubscriber implements EventSubscriberInterf
   public static function getSubscribedEvents() {
     return [
       LocalStockTransactionEvents::LOCAL_STOCK_TRANSACTION_INSERT => 'onTransactionInsert',
+      'commerce_order.place.post_transition' => ['afterOrderPlace'],
+
     ];
   }
 
@@ -61,6 +65,32 @@ class VariationBundleStockTransactionSubscriber implements EventSubscriberInterf
         if ($quantity < 0) {
           $this->variationBundles[] = ['entity' => $purchasable_entity, 'quantity' => $quantity];
         }
+      }
+    }
+  }
+
+  /**
+   * Triggers updating parent bundle stock.
+   *
+   * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
+   *   The event.
+   */
+  public function afterOrderPlace(WorkflowTransitionEvent $event) {
+    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
+    $order = $event->getEntity();
+    $order_items = $order->getItems();
+    $bundle_variation_ids = [];
+    foreach ($order_items as $order_item) {
+      if ($bundle_id = $order_item->getData('bundle_source')) {
+        if (!isset($bundle_variation_ids[$bundle_id])) {
+          $bundle_variation_ids[$bundle_id] = $bundle_id;
+        }
+      }
+    }
+
+    foreach ($bundle_variation_ids as $bundle_variation_id) {
+      if ($bundle_variation = VariationBundle::load($bundle_variation_id)) {
+        $this->stockManager->setStock($bundle_variation);
       }
     }
   }

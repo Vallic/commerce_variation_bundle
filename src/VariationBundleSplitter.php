@@ -105,6 +105,8 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
         'title' => $bundle_amount->getVariation()->getTitle(),
         'unit_price' => $bundle_amount->getPrice(),
         'adjustments' => $bundle_amount->getAdjustments(),
+        // Write bundle source if needed for later troubleshooting.
+        'data' => ['bundle_source' => $order_item->getPurchasedEntityId()],
       ];
       $new_order_item = $order_item_storage->create($order_item_values);
       $new_order_item->save();
