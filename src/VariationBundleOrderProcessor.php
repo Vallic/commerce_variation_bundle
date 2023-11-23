@@ -59,7 +59,7 @@ class VariationBundleOrderProcessor implements OrderProcessorInterface {
           'type' => 'bundle_saving',
           'amount' => $adjustment_amount->multiply($order_item->getQuantity()),
           'label' => $this->t('Bundle saving'),
-          'percentage' => $purchased_entity->isPercentageOffer() ? (string) ($purchased_entity->getBundleDiscount() / 100) : (string) round( abs($adjustment_amount->getNumber()) / $full_price->getNumber(), PHP_ROUND_HALF_UP),
+          'percentage' => $purchased_entity->isPercentageOffer() ? (string) ($purchased_entity->getBundleDiscount() / 100) : (string) abs($adjustment_amount->divide($full_price->getNumber())->getNumber()),
           'source_id' => $purchased_entity->id(),
         ]));
 
