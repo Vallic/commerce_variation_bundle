@@ -1,7 +1,8 @@
 <?php
 
 /**
- * @file Main module file.
+ * @file
+ * Main module file.
  */
 
 use Drupal\commerce_product\Entity\ProductVariationType;
