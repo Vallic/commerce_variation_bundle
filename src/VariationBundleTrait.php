@@ -30,7 +30,7 @@ trait VariationBundleTrait {
    * Determine what attributes variations should use.
    *
    * @param \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations
-   *   The variations
+   *   The product variations.
    *
    * @return bool
    *   True if we need to use default attributes.

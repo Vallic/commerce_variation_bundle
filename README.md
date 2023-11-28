@@ -28,7 +28,7 @@ This module requires Drupal Commerce Core >= 2.30
 
 ## Installation
 
-Install the Commerce Exchanger module as you would normally install
+Install the Commerce Variation Bundle module as you would normally install
 any Drupal contrib module.
 Visit https://www.drupal.org/node/1897420 for further information.
 

@@ -10,9 +10,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Url;
 use Drupal\user\EntityOwnerTrait;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Defines the variation bundle item entity class.

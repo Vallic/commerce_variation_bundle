@@ -3,7 +3,6 @@
 namespace Drupal\commerce_variation_bundle\Entity;
 
 use Drupal\commerce\Entity\CommerceBundleEntityBase;
-use Drupal\Core\Entity\Annotation\ConfigEntityType;
 
 /**
  * Defines the Variation Bundle Item type configuration entity.

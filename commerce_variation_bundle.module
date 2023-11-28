@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file Main module file.
+ */
+
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_variation_bundle\Entity\BundleItemType;
 use Drupal\commerce_variation_bundle\Entity\VariationBundle;
@@ -39,8 +43,6 @@ function template_preprocess_commerce_bundle_item(array &$variables) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 }
-
-
 
 /**
  * Implements hook_entity_bundle_info_alter().
