@@ -51,9 +51,11 @@ function template_preprocess_commerce_bundle_item(array &$variables) {
 function commerce_variation_bundle_entity_bundle_info_alter(array &$bundles): void {
   $enabled_types = commerce_variation_bundle_enabled_types();
 
-  foreach ($bundles['commerce_product_variation'] as $type => $bundle) {
-    if (in_array($type, $enabled_types)) {
-      $bundles['commerce_product_variation'][$type]['class'] = VariationBundle::class;
+  if (!empty($bundles['commerce_product_variation'])) {
+    foreach ($bundles['commerce_product_variation'] as $type => $bundle) {
+      if (in_array($type, $enabled_types)) {
+        $bundles['commerce_product_variation'][$type]['class'] = VariationBundle::class;
+      }
     }
   }
 }

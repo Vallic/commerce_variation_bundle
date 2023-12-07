@@ -60,11 +60,18 @@ class VariationBundle extends ProductVariation implements VariationBundleInterfa
       return parent::generateTitle();
     }
 
-    $titles = array_map(function (BundleItemInterface $bundle_item) {
+    $title = array_map(function (BundleItemInterface $bundle_item) {
       return $bundle_item->getTitle();
     }, $bundle_items);
 
-    return implode(' / ', $titles);
+    $title = implode(' / ', $title);
+
+    // If the title is longer than 255 characters, fallback to default title.
+    if (strlen($title) > 255) {
+      return parent::generateTitle();
+    }
+
+    return $title;
   }
 
   /**

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: bundle
+label: Bundle
+traits:
+  - purchasable_entity_variation_bundle
+locked: false
+orderItemType: default
+generateTitle: true

@@ -81,10 +81,9 @@ class ProductVariationBundleAttributeMapper extends ProductVariationAttributeMap
    * {@inheritdoc}
    */
   public function getAttributeValueId(VariationBundleInterface $product_variation, $field_name) {
-    $attribute_field_manager = \Drupal::service('commerce_product.attribute_field_manager');
     $field_map = [];
     foreach ($product_variation->getBundleVariations() as $variation) {
-      $field_map = array_merge($field_map, $attribute_field_manager->getFieldMap($variation->bundle()));
+      $field_map = array_merge($field_map, $this->attributeFieldManager->getFieldMap($variation->bundle()));
     }
     $field_map = array_column($field_map, 'field_name');
     $attribute_ids = [];

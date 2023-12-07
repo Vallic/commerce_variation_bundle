@@ -127,6 +127,7 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
    */
   protected function groupAdjustments(array $adjustments): array {
     $adjustments_amounts = [];
+    $order_data = [];
     foreach ($adjustments as $adjustment) {
       $amount = $adjustment->isNegative() ? $adjustment->getAmount()->multiply('-1') : $adjustment->getAmount();
 

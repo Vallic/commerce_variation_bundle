@@ -1,0 +1,8 @@
+name: Variation bundle test
+type: module
+description: Contains bundles needed in tests.
+package: Testing
+core_version_requirement: ^10
+
+dependencies:
+  - commerce_variation_bundle:commerce_variation_bundle

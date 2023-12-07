@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+id: bundle
+label: Bundle
+traits: {  }
+locked: false
+description: ''
+variationType: bundle
+variationTypes:
+  - bundle
+multipleVariations: true
+injectVariationFields: true
