@@ -73,7 +73,7 @@ class VariationBundleStockManager implements VariationBundleStockManagerInterfac
     foreach ($bundle_items as $bundle_item) {
       $quantity = $bundle_item->getQuantity();
       $stock = $this->stockServiceManager->getStockLevel($bundle_item->getVariation());
-      if ($stock - $quantity <= 0) {
+      if ($stock - $quantity < 0) {
         return $stock_status;
       }
       $possible_stock[$bundle_item->getVariationId()] = $stock / $quantity;
