@@ -1,7 +1,7 @@
 name: 'Commerce Variation Bundle Attributes'
 type: module
 description: 'Built attributes dynamically from referenced bundle items'
-core_version_requirement: ^10
+core_version_requirement: ^10 || ^11
 package: 'Commerce (contrib)'
 dependencies:
   - commerce_variation_bundle:commerce_variation_bundle
