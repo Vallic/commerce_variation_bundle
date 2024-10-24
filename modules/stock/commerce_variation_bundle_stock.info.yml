@@ -1,8 +1,0 @@
-name: 'Commerce Variation Bundle Stock'
-type: module
-description: 'Handles stock for bundles'
-core_version_requirement: ^10 || ^11
-package: 'Commerce (contrib)'
-dependencies:
-  - commerce_variation_bundle:commerce_variation_bundle
-  - commerce_stock:commerce_stock_local

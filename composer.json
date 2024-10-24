@@ -12,8 +12,5 @@
   },
   "require": {
     "drupal/commerce": "^2 || ^3"
-  },
-  "require-dev": {
-    "drupal/commerce_stock": "^1"
   }
 }
