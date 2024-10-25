@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_variation_bundle;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\commerce_price\Calculator;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Applies bundle savings to orders during the order refresh process.

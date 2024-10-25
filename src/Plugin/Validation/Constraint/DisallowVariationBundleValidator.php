@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_variation_bundle\Plugin\Validation\Constraint;
 
-use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 

@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_variation_bundle_attributes\Plugin\Field\FieldWidget;
 
-use Drupal\commerce_product\Plugin\Field\FieldWidget\ProductVariationAttributesWidget;
-use Drupal\commerce_variation_bundle\VariationBundleTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\commerce_product\Plugin\Field\FieldWidget\ProductVariationAttributesWidget;
+use Drupal\commerce_variation_bundle\VariationBundleTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

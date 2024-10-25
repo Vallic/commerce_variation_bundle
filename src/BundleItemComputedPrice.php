@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_variation_bundle;
 
+use Drupal\Core\Field\FieldItemList;
+use Drupal\Core\TypedData\ComputedItemListTrait;
 use Drupal\commerce\Context;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\commerce_store\SelectStoreTrait;
-use Drupal\Core\Field\FieldItemList;
-use Drupal\Core\TypedData\ComputedItemListTrait;
 
 /**
  * The computed field which exposes the current variation price.

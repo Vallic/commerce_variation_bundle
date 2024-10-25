@@ -5,11 +5,11 @@
  * Main module file.
  */
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_variation_bundle\Entity\BundleItemType;
 use Drupal\commerce_variation_bundle\Entity\VariationBundle;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_theme().

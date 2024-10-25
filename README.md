@@ -14,7 +14,7 @@ The Commerce Variation Bundle allows you to create groups / bundles of product
 variations.
 
 - create bundles by referencing product variations and their quantities
-- pricing model: by percentage / use default price field / pricelist module
+- pricing model: by percentage / use default price field / price list module
 - split bundle into separate items during order placement
 - split bundle option configurable per each product variation bundle entity
 - show saving amount / percentage with new adjustment type - `bundle_saving`

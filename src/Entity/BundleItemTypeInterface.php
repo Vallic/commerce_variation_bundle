@@ -13,7 +13,7 @@ interface BundleItemTypeInterface extends CommerceBundleEntityInterface {
    * Gets whether the bundle item title should be automatically generated.
    *
    * @return bool
-   *   Whether the bundle itemn title should be automatically generated.
+   *   Whether the bundle item title should be automatically generated.
    */
   public function shouldGenerateTitle();
 

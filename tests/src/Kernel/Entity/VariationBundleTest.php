@@ -2,13 +2,13 @@
 
 namespace Drupal\Tests\commerce_variation_bundle\Kernel\Entity;
 
+use Drupal\Tests\commerce_product\Kernel\Entity\ProductVariationTest;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_variation_bundle\Entity\BundleItem;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
-use Drupal\Tests\commerce_product\Kernel\Entity\ProductVariationTest;
 
 /**
  * Tests the Product bundle variation entity.

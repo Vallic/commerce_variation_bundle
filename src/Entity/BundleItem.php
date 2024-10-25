@@ -2,14 +2,14 @@
 
 namespace Drupal\commerce_variation_bundle\Entity;
 
-use Drupal\commerce\Entity\CommerceContentEntityBase;
-use Drupal\commerce_price\Price;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
-use Drupal\commerce_variation_bundle\BundleItemComputedPrice;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\commerce\Entity\CommerceContentEntityBase;
+use Drupal\commerce_price\Price;
+use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\commerce_variation_bundle\BundleItemComputedPrice;
 use Drupal\user\EntityOwnerTrait;
 
 /**

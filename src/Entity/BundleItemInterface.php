@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_variation_bundle\Entity;
 
-use Drupal\commerce_price\Price;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\commerce_price\Price;
+use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**

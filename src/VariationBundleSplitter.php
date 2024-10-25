@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_variation_bundle;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * {@inheritdoc}

@@ -14,8 +14,8 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *   label_singular = @Translation("variation bundle type"),
  *   label_plural = @Translation("variation bundle types"),
  *   label_count = @PluralTranslation(
- *     singular = "@count ariation bundle item type",
- *     plural = "@count ariation bundle item types",
+ *     singular = "@count variation bundle item type",
+ *     plural = "@count variation bundle item types",
  *   ),
  *   handlers = {
  *     "form" = {

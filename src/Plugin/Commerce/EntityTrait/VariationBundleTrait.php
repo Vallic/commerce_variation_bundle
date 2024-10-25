@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_variation_bundle\Plugin\Commerce\EntityTrait;
 
-use Drupal\commerce\Plugin\Commerce\EntityTrait\EntityTraitBase;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\commerce\Plugin\Commerce\EntityTrait\EntityTraitBase;
 use Drupal\entity\BundleFieldDefinition;
 
 /**
