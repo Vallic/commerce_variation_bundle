@@ -11,7 +11,7 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
  */
 class BundleItemAmounts {
 
-  public const BUNDLE_ITEM_AMOUNTS_REQUIRED_PROPERTIES = [
+  public const array BUNDLE_ITEM_AMOUNTS_REQUIRED_PROPERTIES = [
     'quantity',
     'variation_id',
     'price',
@@ -21,7 +21,7 @@ class BundleItemAmounts {
   /**
    * Variation id.
    */
-  protected mixed $variationId;
+  protected string $variationId;
 
   /**
    * The bundle item price.
@@ -120,7 +120,7 @@ class BundleItemAmounts {
    *
    * @return $this
    */
-  public function setAdjustments(array $adjustments) {
+  public function setAdjustments(array $adjustments): static {
     $this->adjustments = $adjustments;
     return $this;
   }

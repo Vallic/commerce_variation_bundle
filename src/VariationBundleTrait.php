@@ -18,7 +18,7 @@ trait VariationBundleTrait {
    * @return bool
    *   True if we have bundle items referenced.
    */
-  public function isBundleActive(ProductVariationInterface $product_variation) {
+  public function isBundleActive(ProductVariationInterface $product_variation): bool {
     if ($product_variation->hasField('bundle_items') && !$product_variation->get('bundle_items')->isEmpty()) {
       return TRUE;
     }

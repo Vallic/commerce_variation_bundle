@@ -2,50 +2,34 @@
 
 namespace Drupal\commerce_variation_bundle_attributes\Plugin\Field\FieldWidget;
 
+use Drupal\commerce_product\ProductVariationAttributeMapperInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\commerce_product\Plugin\Field\FieldWidget\ProductVariationAttributesWidget;
 use Drupal\commerce_variation_bundle\VariationBundleTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'commerce_product_variation_attributes' widget.
- *
- * @FieldWidget(
- *   id = "commerce_variation_bundle_attributes",
- *   label = @Translation("Product variation bundle attributes"),
- *   field_types = {
- *     "entity_reference"
- *   }
- * )
  */
+#[FieldWidget(
+  id: "commerce_variation_bundle_attributes",
+  label: new TranslatableMarkup("Product variation bundle attributes"),
+  field_types: ["entity_reference"],
+)]
 class VariationBundleAttributesWidget extends ProductVariationAttributesWidget implements ContainerFactoryPluginInterface {
 
   use VariationBundleTrait;
 
   /**
-   * The product attribute field manager.
-   *
-   * @var \Drupal\commerce_product\ProductAttributeFieldManagerInterface
-   */
-  protected $attributeFieldManager;
-
-  /**
    * The product variation attribute mapper.
-   *
-   * @var \Drupal\commerce_product\ProductVariationAttributeMapperInterface
    */
-  protected $variationBundleAttributeMapper;
-
-  /**
-   * The field widget manager.
-   *
-   * @var \Drupal\Core\Field\WidgetPluginManager
-   */
-  protected $fieldWidgetManager;
+  protected ProductVariationAttributeMapperInterface $variationBundleAttributeMapper;
 
   /**
    * {@inheritdoc}

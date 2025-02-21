@@ -10,72 +10,68 @@ use Drupal\commerce\Entity\CommerceContentEntityBase;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_variation_bundle\BundleItemComputedPrice;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerTrait;
+use Drupal\Core\Entity\Attribute\ContentEntityType;
 
 /**
  * Defines the variation bundle item entity class.
- *
- * @ContentEntityType(
- *   id = "commerce_bundle_item",
- *   label = @Translation("Variation bundle item"),
- *   label_collection = @Translation("Variation bundle items"),
- *   label_singular = @Translation("variation bundle item"),
- *   label_plural = @Translation("variation bundle items"),
- *   label_count = @PluralTranslation(
- *     singular = "@count variation bundle item",
- *     plural = "@count variation bundle items",
- *   ),
- *   bundle_label = @Translation("Variation bundle item type"),
- *   handlers = {
- *     "views_data" = "Drupal\views\EntityViewsData",
- *     "list_builder" = "Drupal\commerce_variation_bundle\BundleItemListBuilder",
- *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "access" = "Drupal\commerce_variation_bundle\BundleItemAccessControlHandler",
- *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
- *     "form" = {
- *       "add" = "Drupal\commerce_variation_bundle\Form\BundleItemForm",
- *       "edit" = "Drupal\commerce_variation_bundle\Form\BundleItemForm",
- *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm",
- *     },
- *     "local_task_provider" = {
- *       "default" = "Drupal\entity\Menu\DefaultEntityLocalTaskProvider",
- *     },
- *     "route_provider" = {
- *       "default" = "Drupal\commerce_variation_bundle\Routing\BundleItemHtmlRouteProvider",
- *     },
- *   },
- *   base_table = "commerce_bundle_item",
- *   data_table = "commerce_bundle_item_field_data",
- *   translatable = TRUE,
- *   translation = {
- *     "content_translation" = {
- *       "access_callback" = "content_translation_translate_access"
- *     },
- *   },
- *   admin_permission = "administer commerce_product",
- *   entity_keys = {
- *     "id" = "id",
- *     "langcode" = "langcode",
- *     "bundle" = "bundle",
- *     "label" = "title",
- *     "uuid" = "uuid",
- *     "owner" = "uid",
- *   },
- *   links = {
- *     "collection" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}",
- *     "add-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/add",
- *     "add-page" = "/admin/commerce/config/bundle-types/add-item",
- *     "edit-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/edit",
- *     "delete-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/delete",
- *     "drupal:content-translation-overview" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations",
- *     "drupal:content-translation-add" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/add/{source}/{target}",
- *     "drupal:content-translation-edit" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/edit/{language}",
- *     "drupal:content-translation-delete" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/delete/{language}",
- *   },
- *   bundle_entity_type = "commerce_bundle_item_type",
- *   field_ui_base_route = "entity.commerce_bundle_item_type.edit_form",
- * )
  */
+#[ContentEntityType(
+  id: 'commerce_bundle_item',
+  label: new TranslatableMarkup('Variation bundle item'),
+  label_collection: new TranslatableMarkup('Variation bundle items'),
+  label_singular: new TranslatableMarkup('variation bundle item'),
+  label_plural: new TranslatableMarkup('variation bundle items'),
+  label_count: [
+    'singular' => '@count variation bundle item',
+    'plural' => '@count variation bundle items',
+  ],
+  bundle_label: new TranslatableMarkup('Variation bundle item type'),
+  handlers: [
+    'views_data' => 'Drupal\views\EntityViewsData',
+    'list_builder' => 'Drupal\commerce_variation_bundle\BundleItemListBuilder',
+    'view_builder' => 'Drupal\Core\Entity\EntityViewBuilder',
+    'access' => 'Drupal\commerce_variation_bundle\BundleItemAccessControlHandler',
+    'translation' => 'Drupal\content_translation\ContentTranslationHandler',
+    'form' => [
+      'add' => 'Drupal\commerce_variation_bundle\Form\BundleItemForm',
+      'edit' => 'Drupal\commerce_variation_bundle\Form\BundleItemForm',
+      'delete' => 'Drupal\Core\Entity\ContentEntityDeleteForm',
+    ],
+    'local_task_provider' => [
+      'default' => 'Drupal\entity\Menu\DefaultEntityLocalTaskProvider',
+    ],
+    'route_provider' => [
+      'default' => 'Drupal\commerce_variation_bundle\Routing\BundleItemHtmlRouteProvider',
+    ],
+  ],
+  base_table: 'commerce_bundle_item',
+  data_table: 'commerce_bundle_item_field_data',
+  translatable: TRUE,
+  admin_permission: 'administer commerce_product',
+  entity_keys: [
+    'id' => 'id',
+    'langcode' => 'langcode',
+    'bundle' => 'bundle',
+    'label' => 'title',
+    'uuid' => 'uuid',
+    'owner' => 'uid',
+  ],
+  links: [
+    'collection' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}',
+    'add-form' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/add',
+    'add-page' => '/admin/commerce/config/bundle-types/add-item',
+    'edit-form' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/edit',
+    'delete-form' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/delete',
+    'drupal:content-translation-overview' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations',
+    'drupal:content-translation-add' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/add/{source}/{target}',
+    'drupal:content-translation-edit' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/edit/{language}',
+    'drupal:content-translation-delete' => '/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/{commerce_bundle_item}/translations/delete/{language}',
+  ],
+  bundle_entity_type: 'commerce_bundle_item_type',
+  field_ui_base_route: 'entity.commerce_bundle_item_type.edit_form',
+)]
 class BundleItem extends CommerceContentEntityBase implements BundleItemInterface {
 
   use EntityChangedTrait;

@@ -11,6 +11,6 @@
     "source": "http://cgit.drupalcode.org/commerce_variation_bundle"
   },
   "require": {
-    "drupal/commerce": "^2 || ^3"
+    "drupal/commerce": "^2.4 || ^3"
   }
 }

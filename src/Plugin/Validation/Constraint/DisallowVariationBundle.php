@@ -2,17 +2,18 @@
 
 namespace Drupal\commerce_variation_bundle\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * Verifies that referenced variation is not of VariationBundleInterface.
- *
- * @Constraint(
- *   id = "DisallowVariationBundle",
- *   label = @Translation("Valid product variation reference", context = "Validation")
- * )
  */
-class DisallowVariationBundle extends Constraint {
+#[Constraint(
+    id: "DisallowVariationBundle",
+    label: new TranslatableMarkup('Valid product variation reference', [], ['context' => 'Validation'])
+)]
+class DisallowVariationBundle extends SymfonyConstraint {
 
   /**
    * The default violation message.

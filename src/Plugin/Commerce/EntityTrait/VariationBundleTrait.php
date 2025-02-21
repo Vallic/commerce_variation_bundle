@@ -3,18 +3,19 @@
 namespace Drupal\commerce_variation_bundle\Plugin\Commerce\EntityTrait;
 
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\commerce\Plugin\Commerce\EntityTrait\EntityTraitBase;
 use Drupal\entity\BundleFieldDefinition;
+use Drupal\commerce\Attribute\CommerceEntityTrait;
 
 /**
  * Provides the "purchasable_entity_variation_bundle" trait.
- *
- * @CommerceEntityTrait(
- *   id = "purchasable_entity_variation_bundle",
- *   label = @Translation("Variation bundles"),
- *   entity_types = {"commerce_product_variation"}
- * )
  */
+#[CommerceEntityTrait(
+    id: "purchasable_entity_variation_bundle",
+    label: new TranslatableMarkup("Variation bundles"),
+    entity_types: ["commerce_product_variation"]
+)]
 class VariationBundleTrait extends EntityTraitBase {
 
   /**
