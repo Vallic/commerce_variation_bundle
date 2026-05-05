@@ -1,0 +1,12 @@
+commerce_variation_bundle.generate_bundle_variations:
+  path: '/product/{commerce_product}/variations/generate-bundles'
+  defaults:
+    _form: '\Drupal\commerce_variation_bundle\Form\GenerateBundleVariationsForm'
+    _title: 'Generate variations'
+  options:
+    _admin_route: TRUE
+    parameters:
+      commerce_product:
+        type: 'entity:commerce_product'
+  requirements:
+    _custom_access: '\Drupal\commerce_variation_bundle\Access\BundleVariationGenerateAccess::access'

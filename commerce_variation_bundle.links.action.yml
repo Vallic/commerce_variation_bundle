@@ -9,3 +9,9 @@ commerce_bundle_item.add_page:
   route_name: entity.commerce_bundle_item.add_page
   appears_on:
     - entity.commerce_bundle_item.collection
+    
+ commerce_variation_bundle.generate_bundle_variations:
+  route_name: commerce_variation_bundle.generate_bundle_variations
+  title: 'Generate variations'
+  appears_on:
+    - entity.commerce_product_variation.collection

@@ -78,8 +78,6 @@ class VariationBundleTest extends ProductVariationTest {
    * @covers ::setListPrice
    * @covers ::getPrice
    * @covers ::setPrice
-   * @covers ::isActive
-   * @covers ::setActive
    * @covers ::getCreatedTime
    * @covers ::setCreatedTime
    * @covers ::getOwner
