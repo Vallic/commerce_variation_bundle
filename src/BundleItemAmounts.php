@@ -21,7 +21,7 @@ class BundleItemAmounts {
   /**
    * Variation id.
    */
-  protected string $variationId;
+  protected int $variationId;
 
   /**
    * The bundle item price.
