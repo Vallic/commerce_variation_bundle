@@ -88,6 +88,9 @@ class GenerateBundleVariationsForm extends FormBase {
       ['bundle_items', 'sku', 'product_id', 'uid', 'created', 'changed', 'default_langcode'],
       array_keys($this->attributeFieldManager->getFieldMap($variation_type->id())),
     );
+    if ($variation_type->shouldGenerateTitle()) {
+      $excluded[] = 'title';
+    }
     foreach ($excluded as $field_name) {
       $form_display->removeComponent($field_name);
     }
@@ -199,6 +202,10 @@ class GenerateBundleVariationsForm extends FormBase {
     $created = 0;
     $skipped = 0;
 
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+    $variation_type = $this->entityTypeManager->getStorage('commerce_product_variation_type')->load($variation_type_id);
+    $auto_title = $variation_type && $variation_type->shouldGenerateTitle();
+
     foreach ($combinations as $combo) {
       // Build a deterministic SKU from the constituent variation SKUs.
       $sku = substr(implode('-', array_map(fn($v) => $v->getSku(), $combo)), 0, 255);
@@ -215,6 +222,7 @@ class GenerateBundleVariationsForm extends FormBase {
           'bundle' => 'default',
           'variation' => $source_variation->id(),
           'quantity' => 1,
+          'status' => 1,
         ]);
         $bundle_item->save();
         $bundle_items[] = ['target_id' => $bundle_item->id()];
@@ -223,6 +231,9 @@ class GenerateBundleVariationsForm extends FormBase {
       // Create the bundle variation and copy template field values.
       $new_variation = $variation_storage->create(['type' => $variation_type_id]);
       foreach ($field_names as $field_name) {
+        if ($field_name === 'title' && $auto_title) {
+          continue;
+        }
         if ($new_variation->hasField($field_name)) {
           $new_variation->set($field_name, $variation->get($field_name)->getValue());
         }
