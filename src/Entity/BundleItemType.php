@@ -40,8 +40,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "add-form" = "/admin/commerce/config/bundle-types/add",
  *     "edit-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/edit",
  *     "delete-form" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}/delete",
- *     "collection" = "/admin/commerce/config/bundle-types",
- *     "canonical" = "/admin/commerce/config/bundle-types/{commerce_bundle_item_type}"
+ *     "collection" = "/admin/commerce/config/bundle-types"
  *   },
  *   config_export = {
  *     "id",
