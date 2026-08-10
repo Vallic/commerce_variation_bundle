@@ -61,12 +61,16 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
       if ($count_items === 0) {
         foreach ($adjustments_amounts as $type => $adjustments_amount) {
           if (!$adjustments_amount->isZero()) {
+            // Fold the rounding remainder into a single adjustment of this type.
+            // Applying it to every same-type adjustment (e.g. two promotions)
+            // would multiply the correction.
             foreach ($calculated_adjustments as $id => $calculated_adjustment) {
               if ($type === $calculated_adjustment->getType()) {
                 $adjustment_array = $calculated_adjustment->toArray();
                 $adjustment_array['amount'] = $calculated_adjustment->getAmount()->subtract($adjustments_amount);
                 $updated_adjustment = new Adjustment($adjustment_array);
                 $calculated_adjustments[$id] = $updated_adjustment;
+                break;
               }
             }
             $datum->setAdjustments($calculated_adjustments);
@@ -117,19 +121,16 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
    */
   protected function groupAdjustments(array $adjustments): array {
     $adjustments_amounts = [];
-    $order_data = [];
     foreach ($adjustments as $adjustment) {
       $amount = $adjustment->isNegative() ? $adjustment->getAmount()->multiply('-1') : $adjustment->getAmount();
 
-      // Map specific adjustments types.
+      // Map specific adjustments types. Multiple adjustments can share a type
+      // (e.g. two promotions), so accumulate rather than overwrite.
       $adjustment_type = $adjustment->getType();
 
-      if (!isset($order_data[$adjustment_type])) {
-        $adjustments_amounts[$adjustment_type] = $amount;
-      }
-      else {
-        $adjustments_amounts[$adjustment_type] = $order_data[$adjustment_type]->add($amount);
-      }
+      $adjustments_amounts[$adjustment_type] = isset($adjustments_amounts[$adjustment_type])
+        ? $adjustments_amounts[$adjustment_type]->add($amount)
+        : $amount;
     }
 
     return $adjustments_amounts;
