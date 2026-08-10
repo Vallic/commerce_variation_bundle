@@ -29,6 +29,14 @@ class VariationBundleOrderProcessor implements OrderProcessorInterface {
     foreach ($order_items as $order_item) {
       $purchased_entity = $order_item->getPurchasedEntity();
       if ($purchased_entity instanceof VariationBundleInterface) {
+        // A deliberately free bundle - e.g. a gift-with-purchase whose unit
+        // price is zero - has no saving to represent and no
+        // meaningful per-child price split; skip it so the split percentage is
+        // not computed by dividing by a zero bundle price.
+        if ($order_item->getUnitPrice()->isZero()) {
+          continue;
+        }
+
         // During percentage based pricing, we have resolved price
         // as unit price -  full bundle price.
         // Fetch bundle price with percentage applied.
