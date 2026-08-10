@@ -48,10 +48,13 @@ interface VariationBundleInterface extends ProductVariationInterface {
   /**
    * Calculate original bundle price.
    *
+   * @param bool $adjusted
+   *   Whether to return the adjusted price.
+   *
    * @return \Drupal\commerce_price\Price|null
    *   Return price or null.
    */
-  public function getBundlePrice(): ?Price;
+  public function getBundlePrice(bool $adjusted = FALSE): ?Price;
 
   /**
    * Get bundle discount percentage.

@@ -8,15 +8,18 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_variation_bundle\Entity\BundleItem;
+use Drupal\commerce_variation_bundle\Entity\VariationBundle;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Product bundle variation entity.
- *
- * @coversDefaultClass \Drupal\commerce_variation_bundle\Entity\VariationBundle
- *
- * @group commerce_variation_bundle
  */
+#[CoversClass(VariationBundle::class)]
+#[Group('commerce_variation_bundle')]
+#[RunTestsInSeparateProcesses]
 class VariationBundleTest extends ProductVariationTest {
 
   /**
@@ -66,29 +69,7 @@ class VariationBundleTest extends ProductVariationTest {
   }
 
   /**
-   * @covers ::getOrderItemTypeId
-   * @covers ::getOrderItemTitle
-   * @covers ::getProduct
-   * @covers ::getProductId
-   * @covers ::getSku
-   * @covers ::setSku
-   * @covers ::getTitle
-   * @covers ::setTitle
-   * @covers ::getListPrice
-   * @covers ::setListPrice
-   * @covers ::getPrice
-   * @covers ::setPrice
-   * @covers ::getCreatedTime
-   * @covers ::setCreatedTime
-   * @covers ::getOwner
-   * @covers ::setOwner
-   * @covers ::getOwnerId
-   * @covers ::setOwnerId
-   * @covers ::getStores
-   * @covers ::getBundleVariations
-   * @covers ::getBundleDiscount
-   * @covers ::getBundleItems
-   * @covers ::getBundlePrice
+   * Tests the bundle variation getters, including the bundle price.
    */
   public function testProductVariation() {
     // Verify we don't break Commerce core product variation.

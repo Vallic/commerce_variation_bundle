@@ -77,7 +77,7 @@ class VariationBundle extends ProductVariation implements VariationBundleInterfa
   /**
    * {@inheritdoc}
    */
-  public function getBundlePrice($adjusted = FALSE): ?Price {
+  public function getBundlePrice(bool $adjusted = FALSE): ?Price {
     $calculated_price = NULL;
     foreach ($this->getBundleItems() as $bundle_item) {
       if (!$calculated_price) {

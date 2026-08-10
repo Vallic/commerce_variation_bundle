@@ -3,19 +3,20 @@
 namespace Drupal\Tests\commerce_variation_bundle\Kernel\Entity;
 
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
-
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_variation_bundle\Entity\BundleItem;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the bundle item entity.
- *
- * @coversDefaultClass \Drupal\commerce_variation_bundle\Entity\BundleItem
- *
- * @group commerce_variation_bundle
  */
+#[CoversClass(BundleItem::class)]
+#[Group('commerce_variation_bundle')]
+#[RunTestsInSeparateProcesses]
 class BundleItemTest extends CommerceKernelTestBase {
 
   /**
@@ -52,13 +53,7 @@ class BundleItemTest extends CommerceKernelTestBase {
   }
 
   /**
-   * @covers ::getTitle
-   * @covers ::getQuantity
-   * @covers ::getVariation
-   * @covers ::getOwner
-   * @covers ::getVariationId
-   * @covers ::setQuantity
-   * @covers ::getPrice
+   * Tests the bundle item getters and setters.
    */
   public function testBundleItem() {
     /** @var \Drupal\commerce_product\Entity\ProductInterface $product_default */

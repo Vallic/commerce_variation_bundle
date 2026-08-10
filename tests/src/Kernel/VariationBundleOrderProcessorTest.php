@@ -13,14 +13,17 @@ use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_variation_bundle\BundleItemAmounts;
 use Drupal\commerce_variation_bundle\Entity\BundleItem;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
+use Drupal\commerce_variation_bundle\VariationBundleOrderProcessor;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the bundle saving adjustment applied during the order refresh.
- *
- * @coversDefaultClass \Drupal\commerce_variation_bundle\VariationBundleOrderProcessor
- *
- * @group commerce_variation_bundle
  */
+#[CoversClass(VariationBundleOrderProcessor::class)]
+#[Group('commerce_variation_bundle')]
+#[RunTestsInSeparateProcesses]
 class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
 
   /**
@@ -76,7 +79,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests the saving applied to a fixed price bundle.
    */
   public function testFixedPriceBundleIsAdjustedDownToTheOfferPrice(): void {
     // The bundle is offered at 35.00 while its items are worth 40.50, so the
@@ -96,7 +99,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests the saving applied to a percentage based bundle.
    */
   public function testPercentageBundleUsesTheConfiguredDiscount(): void {
     $this->bundle->set('bundle_discount', 20);
@@ -116,7 +119,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests the per item amounts written to the order item.
    */
   public function testBundleItemAmountsAreStoredOnTheOrderItem(): void {
     $order_item = $this->processOrderItem('35.00', '2');
@@ -137,7 +140,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests that a bundle with a zero unit price is skipped.
    */
   public function testFreeBundleIsSkipped(): void {
     // A gift-with-purchase bundle has no saving to represent, and dividing
@@ -151,7 +154,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests that a bundle sold at its full price gets no saving.
    */
   public function testBundleSoldAtItsFullPriceGetsNoAdjustment(): void {
     $order_item = $this->processOrderItem('40.50', '1');
@@ -161,7 +164,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests that a bundle priced above its items gets no saving.
    */
   public function testBundlePricedAboveItsItemsGetsNoAdjustment(): void {
     // A positive difference would read as a surcharge rather than a saving.
@@ -172,7 +175,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests that a manually overridden unit price survives the refresh.
    */
   public function testOverriddenUnitPriceIsPreserved(): void {
     $order_item = $this->buildOrderItem('35.00', '1');
@@ -187,7 +190,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests that an order item without a bundle is left alone.
    */
   public function testRegularVariationsAreLeftAlone(): void {
     $variation = $this->createVariation('12.00');
@@ -206,7 +209,7 @@ class VariationBundleOrderProcessorTest extends OrderKernelTestBase {
   }
 
   /**
-   * @covers ::process
+   * Tests that an order without items is ignored.
    */
   public function testEmptyOrderIsIgnored(): void {
     $order = $this->buildOrder([]);

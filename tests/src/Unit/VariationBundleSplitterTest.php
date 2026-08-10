@@ -14,14 +14,16 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_variation_bundle\BundleItemAmounts;
 use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
 use Drupal\commerce_variation_bundle\VariationBundleSplitter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests splitting order item adjustments across the items of a bundle.
- *
- * @coversDefaultClass \Drupal\commerce_variation_bundle\VariationBundleSplitter
- *
- * @group commerce_variation_bundle
  */
+#[CoversClass(VariationBundleSplitter::class)]
+#[Group('commerce_variation_bundle')]
+#[RunTestsInSeparateProcesses]
 class VariationBundleSplitterTest extends UnitTestCase {
 
   /**
@@ -53,7 +55,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that an order item without a bundle is left alone.
    */
   public function testSplitIgnoresNonBundlePurchasedEntities(): void {
     $order_item = $this->createMock(OrderItemInterface::class);
@@ -65,7 +67,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that an order item carrying no bundle data is left alone.
    */
   public function testSplitIgnoresOrderItemsWithoutBundleData(): void {
     $order_item = $this->createMock(OrderItemInterface::class);
@@ -78,9 +80,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
-   * @covers ::groupAdjustments
-   * @covers ::splitAdjustments
+   * Tests that every bundle item gets its share of the adjustments.
    */
   public function testSplitDistributesAdjustmentsByPercentage(): void {
     $order_item = $this->buildOrderItem(
@@ -97,7 +97,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that the rounding remainder lands on the last bundle item.
    */
   public function testSplitFoldsRoundingRemainderIntoTheLastItem(): void {
     // Three equal items round to 0.33 each, so a straight split only accounts
@@ -116,7 +116,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that the remainder is applied once per adjustment type.
    */
   public function testSplitAppliesRemainderOnceForRepeatedAdjustmentTypes(): void {
     // Two promotions share the "promotion" type. The 0.10 remainder must be
@@ -138,7 +138,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that each adjustment type carries its own remainder.
    */
   public function testSplitKeepsAdjustmentTypesSeparate(): void {
     $order_item = $this->buildOrderItem(
@@ -159,7 +159,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that label, percentage and source survive the split.
    */
   public function testSplitLeavesAdjustmentMetadataIntact(): void {
     $order_item = $this->buildOrderItem(
@@ -176,7 +176,7 @@ class VariationBundleSplitterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::split
+   * Tests that an order item without adjustments still splits.
    */
   public function testSplitWithoutAdjustmentsStillReturnsBundleAmounts(): void {
     $order_item = $this->buildOrderItem(['1' => '0.50', '2' => '0.50'], []);
