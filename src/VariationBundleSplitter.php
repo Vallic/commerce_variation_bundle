@@ -52,21 +52,31 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
       }
       --$count_items;
 
-      // Last item. Check if original adjustments amounts minus split ones
-      // equals 0. If not subtract that difference.
-      // If is larger, we subtract. If is smaller, $amount
-      // is going to be negative,
-      // and therefore subtract negative is going add upon.
-      // Usually this is one cent on taxes, etc... due to split of amount.
+      // Last item. Whatever magnitude is left over after splitting - usually a
+      // cent or two, because the split percentages are rounded - has to be
+      // folded back in so the parts add up to the original adjustment.
       if ($count_items === 0) {
         foreach ($adjustments_amounts as $type => $adjustments_amount) {
           if (!$adjustments_amount->isZero()) {
+            // Fold the rounding remainder into a single adjustment of this
+            // type. Applying it to every same-type adjustment (e.g. two
+            // promotions) would multiply the correction.
             foreach ($calculated_adjustments as $id => $calculated_adjustment) {
               if ($type === $calculated_adjustment->getType()) {
                 $adjustment_array = $calculated_adjustment->toArray();
-                $adjustment_array['amount'] = $calculated_adjustment->getAmount()->subtract($adjustments_amount);
+                // $adjustments_amount is a magnitude,
+                // because groupAdjustments() flips negative adjustments when
+                // totaling them. Growing the magnitude therefore means
+                // subtracting from a negative adjustment but adding to a
+                // positive one such as tax. A negative remainder means the
+                // split overshot, and the same operations shrink the
+                // magnitude instead.
+                $adjustment_array['amount'] = $calculated_adjustment->isNegative()
+                  ? $calculated_adjustment->getAmount()->subtract($adjustments_amount)
+                  : $calculated_adjustment->getAmount()->add($adjustments_amount);
                 $updated_adjustment = new Adjustment($adjustment_array);
                 $calculated_adjustments[$id] = $updated_adjustment;
+                break;
               }
             }
             $datum->setAdjustments($calculated_adjustments);
@@ -117,19 +127,16 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
    */
   protected function groupAdjustments(array $adjustments): array {
     $adjustments_amounts = [];
-    $order_data = [];
     foreach ($adjustments as $adjustment) {
       $amount = $adjustment->isNegative() ? $adjustment->getAmount()->multiply('-1') : $adjustment->getAmount();
 
-      // Map specific adjustments types.
+      // Map specific adjustments types. Multiple adjustments can share a type
+      // (e.g. two promotions), so accumulate rather than overwrite.
       $adjustment_type = $adjustment->getType();
 
-      if (!isset($order_data[$adjustment_type])) {
-        $adjustments_amounts[$adjustment_type] = $amount;
-      }
-      else {
-        $adjustments_amounts[$adjustment_type] = $order_data[$adjustment_type]->add($amount);
-      }
+      $adjustments_amounts[$adjustment_type] = isset($adjustments_amounts[$adjustment_type])
+        ? $adjustments_amounts[$adjustment_type]->add($amount)
+        : $amount;
     }
 
     return $adjustments_amounts;

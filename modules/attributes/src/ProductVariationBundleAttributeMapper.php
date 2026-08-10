@@ -31,12 +31,8 @@ class ProductVariationBundleAttributeMapper extends ProductVariationAttributeMap
         $existing_attributes = $this->collectAttributes($variation);
         $match = 0;
         foreach ($valid_attributes as $type => $attribute_value) {
-          // If passed attribute is empty, considered is as match, if
-          // other variation does not have this attribute.
-          if (!isset($existing_attributes[$type]) && empty($attribute_value)) {
-            $match++;
-          }
-
+          // Empty values were filtered out of $valid_attributes above, so
+          // every value here is a real attribute value to match against.
           if (isset($existing_attributes[$type][(int) $attribute_value])) {
             $match++;
           }

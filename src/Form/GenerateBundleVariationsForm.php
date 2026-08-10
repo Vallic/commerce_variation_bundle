@@ -20,13 +20,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * to each variation in the combination. Field values entered on the form are
  * copied to every generated variation.
  */
-class GenerateBundleVariationsForm extends FormBase {
+final class GenerateBundleVariationsForm extends FormBase {
 
+  /**
+   * Constructs a new GenerateBundleVariationsForm object.
+   *
+   * The promoted properties are neither private nor readonly, because
+   * DependencySerializationTrait - which FormBase uses on our behalf - restores
+   * services after the form object is unserialized, and its __wakeup() can
+   * reach neither a private property nor, before PHP 8.4, a readonly one
+   * declared in a child class.
+   *
+   * @see https://www.drupal.org/node/3110266
+   */
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly CurrentRouteMatch $currentRouteMatch,
-    private readonly ProductAttributeFieldManagerInterface $attributeFieldManager,
-    private readonly ModuleHandlerInterface $moduleHandler,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected CurrentRouteMatch $currentRouteMatch,
+    protected ProductAttributeFieldManagerInterface $attributeFieldManager,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**

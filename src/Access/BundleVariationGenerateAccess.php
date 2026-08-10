@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Grants access only when the product's variation type has the bundle trait.
  */
-class BundleVariationGenerateAccess implements ContainerInjectionInterface {
+final class BundleVariationGenerateAccess implements ContainerInjectionInterface {
 
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
