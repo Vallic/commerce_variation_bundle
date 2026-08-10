@@ -69,7 +69,7 @@ class VariationBundleSplitter implements VariationBundleSplitterInterface {
                 $calculated_adjustments[$id] = $updated_adjustment;
               }
             }
-            $datum->setAdjustments($adjustments);
+            $datum->setAdjustments($calculated_adjustments);
           }
         }
       }
