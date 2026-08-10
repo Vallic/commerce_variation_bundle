@@ -34,13 +34,13 @@ class VariationBundleTrait extends EntityTraitBase {
         'weight' => 0,
         'settings' => [
           'override_labels' => TRUE,
-          'label_singular' => t('bundle item'),
-          'label_plural' => t('bundle items'),
+          'label_singular' => new TranslatableMarkup('bundle item'),
+          'label_plural' => new TranslatableMarkup('bundle items'),
         ],
       ]);
     $fields['bundle_discount'] = BundleFieldDefinition::create('integer')
-      ->setLabel(t('Bundle discount'))
-      ->setDescription(t('Enter a percentage to discount the bundle item price. Use 0 to use regular price field or price lists.'))
+      ->setLabel(new TranslatableMarkup('Bundle discount'))
+      ->setDescription(new TranslatableMarkup('Enter a percentage to discount the bundle item price. Use 0 to use regular price field or price lists.'))
       ->setSetting('display_description', TRUE)
       ->setSetting('max', 100)
       ->setSetting('suffix', '%')
@@ -51,8 +51,8 @@ class VariationBundleTrait extends EntityTraitBase {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['bundle_split'] = BundleFieldDefinition::create('boolean')
-      ->setLabel(t('Split bundle'))
-      ->setDescription(t('Split bundle items into separate order items after order is placed'))
+      ->setLabel(new TranslatableMarkup('Split bundle'))
+      ->setDescription(new TranslatableMarkup('Split bundle items into separate order items after order is placed'))
       ->setSetting('display_description', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',

@@ -80,12 +80,9 @@ class BundleItemTypeForm extends BundleEntityFormBase {
     $status = $entity_type->save();
 
     $t_args = ['%name' => $entity_type->label()];
-    if ($status == SAVED_UPDATED) {
-      $message = $this->t('The variation bundle item type %name has been updated.', $t_args);
-    }
-    elseif ($status == SAVED_NEW) {
-      $message = $this->t('The variation bundle item type %name has been added.', $t_args);
-    }
+    $message = $status == SAVED_UPDATED
+      ? $this->t('The variation bundle item type %name has been updated.', $t_args)
+      : $this->t('The variation bundle item type %name has been added.', $t_args);
     $this->messenger()->addStatus($message);
 
     $form_state->setRedirectUrl($entity_type->toUrl('collection'));

@@ -46,7 +46,7 @@ class VariationBundleOrderProcessor implements OrderProcessorInterface {
         }
         // During regular price field or price lists get full original price
         // and set it as override unit price.
-        // We can't have it resolved immediately, because it's a chicken and egg
+        // We can't have it resolved immediately, because it's a chicken-and-egg
         // problem.
         else {
           $full_price = $purchased_entity->getBundlePrice();
