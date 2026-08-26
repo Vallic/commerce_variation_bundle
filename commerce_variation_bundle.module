@@ -8,8 +8,10 @@
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\commerce_variation_bundle\Entity\BundleItemType;
 use Drupal\commerce_variation_bundle\Entity\VariationBundle;
+use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
 
 /**
  * Implements hook_theme().
@@ -108,4 +110,53 @@ function commerce_variation_bundle_inline_entity_form_table_fields_alter(array &
       'weight' => 10,
     ];
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds the bundle title separator to the variation type form, next to the
+ * "Generate variation titles" checkbox it belongs with. A bundle variation is
+ * named after the items it holds - see VariationBundle::generateTitle() - and
+ * this is what joins them.
+ */
+function commerce_variation_bundle_form_commerce_product_variation_type_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
+  $variation_type = $form_state->getFormObject()->getEntity();
+
+  $form['commerce_variation_bundle_title_separator'] = [
+    '#type' => 'textfield',
+    '#title' => t('Bundle title separator'),
+    '#description' => t('Placed between the bundle items of a generated title, giving %example. Only used by variation types carrying the "Variation bundles" trait.', [
+      '%example' => '1x Cleanser & 2x Serum',
+    ]),
+    '#default_value' => $variation_type->getThirdPartySetting('commerce_variation_bundle', 'title_separator') ?? VariationBundleInterface::DEFAULT_TITLE_SEPARATOR,
+    '#size' => 8,
+    '#weight' => $form['generateTitle']['#weight'] ?? 0,
+    '#states' => [
+      'visible' => [':input[name="generateTitle"]' => ['checked' => TRUE]],
+    ],
+  ];
+
+  $form['#entity_builders'][] = 'commerce_variation_bundle_variation_type_builder';
+}
+
+/**
+ * Entity builder for the variation type form.
+ *
+ * @param string $entity_type
+ *   The entity type id.
+ * @param \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type
+ *   The variation type being edited.
+ * @param array $form
+ *   The form.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ */
+function commerce_variation_bundle_variation_type_builder($entity_type, ProductVariationTypeInterface $variation_type, array &$form, FormStateInterface $form_state): void {
+  $variation_type->setThirdPartySetting(
+    'commerce_variation_bundle',
+    'title_separator',
+    (string) $form_state->getValue('commerce_variation_bundle_title_separator'),
+  );
 }

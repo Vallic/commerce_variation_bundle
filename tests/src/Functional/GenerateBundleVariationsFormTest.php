@@ -157,7 +157,7 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
     $this->submitForm(['price[0][number]' => '30.00'], 'Generate bundle variations');
     $this->assertSession()->pageTextContains('Generated 2 bundle variations.');
 
-    $this->assertGeneratedSkuList(['HAT-S-SCARF-RED', 'HAT-S-SCARF-BLUE']);
+    $this->assertGeneratedSkuList($this->prefixed(['HAT-S-SCARF-RED', 'HAT-S-SCARF-BLUE']));
   }
 
   /**
@@ -171,15 +171,15 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
     $this->submitForm(['price[0][number]' => '30.00'], 'Generate bundle variations');
     $this->assertSession()->pageTextContains('Generated 4 bundle variations.');
 
-    $this->assertGeneratedSkuList([
+    $this->assertGeneratedSkuList($this->prefixed([
       'HAT-S-SCARF-RED',
       'HAT-S-SCARF-BLUE',
       'HAT-L-SCARF-RED',
       'HAT-L-SCARF-BLUE',
-    ]);
+    ]));
 
     // Every bundle holds one of each, the form default.
-    $bundle = $this->loadGeneratedVariation('HAT-S-SCARF-RED');
+    $bundle = $this->loadGeneratedVariation($this->prefixed(['HAT-S-SCARF-RED'])[0]);
     $quantities = array_map(fn($item) => $item->getQuantity(), $bundle->getBundleItems());
     $this->assertEquals(['1.00', '1.00'], array_values($quantities));
     $this->assertEquals(new Price('35.00', 'USD'), $bundle->getBundlePrice());
@@ -229,13 +229,14 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
     $this->submitForm(['price[0][number]' => '30.00'], 'Generate bundle variations');
     $this->assertSession()->pageTextContains('Generated 4 bundle variations.');
 
-    // The same combinations again, at a different quantity but without the
-    // quantity in the SKU, collide with what is already there.
+    // The same combinations again, at a different quantity but with the
+    // quantity kept out of the SKU, collide with what is already there.
     $this->drupalGet($this->generatePath($this->bundleProduct));
     $this->addProduct($this->hats);
     $this->addProduct($this->scarves);
     $this->submitForm([
       'sources[products][' . $this->scarves->id() . '][quantity]' => '2',
+      'sku_options[include_quantities]' => FALSE,
       'price[0][number]' => '30.00',
     ], 'Generate bundle variations');
     $this->assertSession()->pageTextContains('Skipped 4 variations with duplicate SKUs.');
@@ -253,7 +254,7 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
     ], 'Generate bundle variations');
     $this->assertSession()->pageTextContains('Generated 4 bundle variations.');
 
-    $this->assertGeneratedSkuList([
+    $this->assertGeneratedSkuList($this->prefixed([
       'HAT-S-SCARF-RED',
       'HAT-S-SCARF-BLUE',
       'HAT-L-SCARF-RED',
@@ -262,18 +263,23 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
       'HAT-S-SCARF-BLUEx2',
       'HAT-L-SCARF-REDx2',
       'HAT-L-SCARF-BLUEx2',
-    ]);
+    ]));
   }
 
   /**
    * Tests a bundle built from a single product, such as a multi-pack.
    */
   public function testSingleProductBundleNeedsSkuOption(): void {
-    // With one source product and a quantity of one, the generated SKU is the
-    // child SKU verbatim, so it always collides with the child variation.
+    // With one source product at a quantity of one and both SKU options off,
+    // the generated SKU is the child SKU verbatim, so it always collides with
+    // the child variation.
     $this->drupalGet($this->generatePath($this->bundleProduct));
     $this->addProduct($this->hats);
-    $this->submitForm(['price[0][number]' => '30.00'], 'Generate bundle variations');
+    $this->submitForm([
+      'sku_options[include_quantities]' => FALSE,
+      'sku_options[include_product_id]' => FALSE,
+      'price[0][number]' => '30.00',
+    ], 'Generate bundle variations');
 
     $this->assertSession()->pageTextContains('Skipped 2 variations with duplicate SKUs.');
     $this->assertEmpty($this->loadGeneratedVariations());
@@ -284,6 +290,7 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
     $this->submitForm([
       'sources[products][' . $this->hats->id() . '][quantity]' => '3',
       'sku_options[include_quantities]' => TRUE,
+      'sku_options[include_product_id]' => FALSE,
       'price[0][number]' => '40.00',
     ], 'Generate bundle variations');
 
@@ -373,6 +380,25 @@ class GenerateBundleVariationsFormTest extends CommerceBrowserTestBase {
 
     $this->getSession()->getPage()->uncheckField(
       sprintf('sources[products][%s][variations][%s]', $product->id(), $variation->id())
+    );
+  }
+
+  /**
+   * Prefixes SKUs with the bundle product id.
+   *
+   * "Include the parent product ID" is on by default, so a generated SKU
+   * carries it unless a test turns the option off.
+   *
+   * @param string[] $sku_list
+   *   The unprefixed SKUs.
+   *
+   * @return string[]
+   *   The SKUs as generated.
+   */
+  protected function prefixed(array $sku_list): array {
+    return array_map(
+      fn(string $sku): string => $this->bundleProduct->id() . '-' . $sku,
+      $sku_list,
     );
   }
 

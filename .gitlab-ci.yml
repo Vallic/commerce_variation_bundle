@@ -52,7 +52,7 @@ variables:
   _SHOW_ENVIRONMENT_VARIABLES: 1
   OPT_IN_TEST_CURRENT: 1
   OPT_IN_TEST_PREVIOUS_MAJOR: 1
-  _CSPELL_WORDS: 'Međimorec,valic'
+  _CSPELL_WORDS: 'Međimorec,valic,quantityx'
 #   SKIP_ESLINT: '1'
 
 

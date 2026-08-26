@@ -4,3 +4,4 @@ dependencies: {  }
 id: default
 label: Default
 generateTitle: true
+titlePattern: '@quantityx @title'

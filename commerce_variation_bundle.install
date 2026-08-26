@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for Commerce Variation Bundle.
+ */
+
+use Drupal\commerce_variation_bundle\Entity\BundleItemTypeInterface;
+
+/**
+ * Adds the generated title pattern to existing bundle item types.
+ */
+function commerce_variation_bundle_update_10001(): string {
+  $config_factory = \Drupal::configFactory();
+  $updated = [];
+
+  foreach ($config_factory->listAll('commerce_variation_bundle.commerce_bundle_item_type.') as $name) {
+    $config = $config_factory->getEditable($name);
+
+    // Only types created before the pattern existed. Anything already carrying
+    // one was either saved since or has been set deliberately.
+    if ($config->get('titlePattern') !== NULL) {
+      continue;
+    }
+
+    // The format bundle item titles were hardcoded to before this was
+    // configurable, so existing titles keep regenerating unchanged.
+    $config->set('titlePattern', BundleItemTypeInterface::DEFAULT_TITLE_PATTERN)->save(TRUE);
+    $updated[] = $config->get('id');
+  }
+
+  if (!$updated) {
+    return (string) t('No bundle item types needed the title pattern.');
+  }
+
+  return (string) t('Added the default title pattern to: @types.', [
+    '@types' => implode(', ', $updated),
+  ]);
+}

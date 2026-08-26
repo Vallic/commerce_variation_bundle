@@ -11,6 +11,11 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 interface VariationBundleInterface extends ProductVariationInterface {
 
   /**
+   * Placed between bundle items when a variation type has no separator set.
+   */
+  const DEFAULT_TITLE_SEPARATOR = ' & ';
+
+  /**
    * List of referenced bundle items.
    *
    * @return \Drupal\commerce_variation_bundle\Entity\BundleItem[]

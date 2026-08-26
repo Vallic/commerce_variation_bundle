@@ -18,3 +18,8 @@ services:
     arguments: ['@commerce_variation_bundle.bundle_splitter']
     tags:
       - { name: event_subscriber }
+
+  commerce_variation_bundle.variation_generator:
+    class: Drupal\commerce_variation_bundle\BundleVariationGenerator
+    arguments: ['@entity_type.manager', '@event_dispatcher']
+  Drupal\commerce_variation_bundle\BundleVariationGeneratorInterface: '@commerce_variation_bundle.variation_generator'

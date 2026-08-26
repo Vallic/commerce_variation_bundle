@@ -46,6 +46,7 @@ use Drupal\commerce\Entity\CommerceBundleEntityBase;
  *     "id",
  *     "label",
  *     "generateTitle",
+ *     "titlePattern",
  *     "uuid",
  *   }
  * )
@@ -58,6 +59,13 @@ class BundleItemType extends CommerceBundleEntityBase implements BundleItemTypeI
    * @var string
    */
   protected $id;
+
+  /**
+   * How a generated bundle item title is built.
+   *
+   * @var string
+   */
+  protected $titlePattern = self::DEFAULT_TITLE_PATTERN;
 
   /**
    * The human-readable name of the product variation bundle type.
@@ -78,6 +86,21 @@ class BundleItemType extends CommerceBundleEntityBase implements BundleItemTypeI
    */
   public function shouldGenerateTitle(): bool {
     return (bool) $this->generateTitle;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTitlePattern(): string {
+    return $this->titlePattern ?: self::DEFAULT_TITLE_PATTERN;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTitlePattern(string $pattern): static {
+    $this->titlePattern = $pattern;
+    return $this;
   }
 
   /**

@@ -278,7 +278,18 @@ class BundleItem extends CommerceContentEntityBase implements BundleItemInterfac
    */
   protected function generateTitle() {
     $product_variation = $this->getVariation();
-    return sprintf('%sx %s', (int) $this->getQuantity(), $product_variation->getTitle());
+
+    /** @var \Drupal\commerce_variation_bundle\Entity\BundleItemTypeInterface|null $bundle_item_type */
+    $bundle_item_type = $this->entityTypeManager()
+      ->getStorage('commerce_bundle_item_type')
+      ->load($this->bundle());
+    $pattern = $bundle_item_type?->getTitlePattern() ?: BundleItemTypeInterface::DEFAULT_TITLE_PATTERN;
+
+    return str_replace(
+      ['@quantity', '@title'],
+      [(string) (int) $this->getQuantity(), (string) $product_variation->getTitle()],
+      $pattern,
+    );
   }
 
   /**

@@ -6,6 +6,7 @@ use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\entity\Form\EntityDuplicateFormTrait;
+use Drupal\commerce_variation_bundle\Entity\BundleItemTypeInterface;
 
 /**
  * Form handler for product variation bundle type forms.
@@ -54,6 +55,21 @@ class BundleItemTypeForm extends BundleEntityFormBase {
       '#default_value' => $entity_type->shouldGenerateTitle(),
     ];
 
+    $form['titlePattern'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Generated title pattern'),
+      '#description' => $this->t('How a generated title is built. @quantity is the quantity the bundle holds and @title the variation title, giving %example.', [
+        '@quantity' => '@quantity',
+        '@title' => '@title',
+        '%example' => '2x Facial cleanser',
+      ]),
+      '#default_value' => $entity_type->getTitlePattern(),
+      '#size' => 30,
+      '#states' => [
+        'visible' => [':input[name="generateTitle"]' => ['checked' => TRUE]],
+      ],
+    ];
+
     return $this->protectBundleIdElement($form);
   }
 
@@ -76,6 +92,7 @@ class BundleItemTypeForm extends BundleEntityFormBase {
     $entity_type->set('id', trim($entity_type->id()));
     $entity_type->set('label', trim($entity_type->label()));
     $entity_type->set('generateTitle', (bool) $entity_type->shouldGenerateTitle());
+    $entity_type->set('titlePattern', trim((string) $entity_type->getTitlePattern()) ?: BundleItemTypeInterface::DEFAULT_TITLE_PATTERN);
 
     $status = $entity_type->save();
 

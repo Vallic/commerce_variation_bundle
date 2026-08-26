@@ -5,15 +5,19 @@ namespace Drupal\commerce_variation_bundle\Form;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\commerce_variation_bundle\BundleVariationGeneratorInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\commerce_product\Entity\ProductInterface;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\Entity\ProductVariationTypeInterface;
 use Drupal\commerce_product\ProductAttributeFieldManagerInterface;
 use Drupal\commerce_product\ProductVariationStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\commerce_variation_bundle\Entity\VariationBundleInterface;
+use Drupal\commerce_variation_bundle\Entity\BundleItemTypeInterface;
+use Drupal\Core\Url;
 
 /**
  * Generates bundle variations from combinations of other products' variations.
@@ -58,6 +62,7 @@ final class GenerateBundleVariationsForm extends FormBase {
     protected CurrentRouteMatch $currentRouteMatch,
     protected ProductAttributeFieldManagerInterface $attributeFieldManager,
     protected ModuleHandlerInterface $moduleHandler,
+    protected BundleVariationGeneratorInterface $variationGenerator,
   ) {}
 
   /**
@@ -69,6 +74,7 @@ final class GenerateBundleVariationsForm extends FormBase {
       $container->get('current_route_match'),
       $container->get('commerce_product.attribute_field_manager'),
       $container->get('module_handler'),
+      $container->get('commerce_variation_bundle.variation_generator'),
     );
   }
 
@@ -101,6 +107,7 @@ final class GenerateBundleVariationsForm extends FormBase {
 
     $form['sources'] = $this->buildSources($form_state);
     $form['sku_options'] = $this->buildSkuOptions($product);
+    $form['title_options'] = $this->buildTitleOptions($variation_type);
 
     // Build a temporary (unsaved) variation to drive the field widgets.
     $variation = $this->entityTypeManager
@@ -126,6 +133,24 @@ final class GenerateBundleVariationsForm extends FormBase {
     // Build variation field widgets directly into $form, mirroring
     // ContentEntityForm so the layout matches the create variation form.
     $form_display->buildForm($variation, $form, $form_state);
+
+    // The generated title replaces whatever is entered here, so hiding the
+    // field says so plainly rather than leaving a value that is silently
+    // ignored.
+    if (isset($form['title'], $form['title_options'])) {
+      $form['title']['#states']['invisible'] = [
+        ':input[name="title_options[generate]"]' => ['checked' => TRUE],
+      ];
+
+      // #states is presentation only, and the title widget is required. Core
+      // validates required elements before any #validate handler runs, so a
+      // hidden and empty title would fail the form before validateForm() had a
+      // chance to exclude it. The raw input is read rather than the values,
+      // which are not mapped yet while the form is being built.
+      if (!empty($form_state->getUserInput()['title_options']['generate'])) {
+        $this->clearRequired($form['title']);
+      }
+    }
 
     // Attach field_group groups so tabs/fieldsets from the form display render.
     if ($this->moduleHandler->moduleExists('field_group')) {
@@ -176,6 +201,16 @@ final class GenerateBundleVariationsForm extends FormBase {
       '#target_type' => 'commerce_product',
       '#title' => $this->t('Add a product'),
       '#description' => $this->t('One bundle variation is created per combination of the variations selected below.'),
+      // Keeps bundle products out of the suggestions.
+      '#selection_settings' => [
+        'target_bundles' => $this->variationGenerator->getSourceProductTypeIds(),
+      ],
+      // The suggestions are filtered, but the reference is not validated
+      // against that filter: a product typed in full would otherwise be
+      // refused with "The referenced entity does not exist", which is both
+      // untrue and unhelpful. addProduct() does the check instead and can say
+      // why - it is a bundle, or it is this very product.
+      '#validate_reference' => FALSE,
     ];
     $sources['add_submit'] = [
       '#type' => 'submit',
@@ -298,7 +333,7 @@ final class GenerateBundleVariationsForm extends FormBase {
           '%with' => 'F381M-F382M-F1061x3',
           '%without' => 'F381M-F382M-F1061',
         ]),
-        '#default_value' => FALSE,
+        '#default_value' => TRUE,
       ],
       'include_product_id' => [
         '#type' => 'checkbox',
@@ -306,9 +341,119 @@ final class GenerateBundleVariationsForm extends FormBase {
         '#description' => $this->t('Prefixes the SKU with the ID of this product, giving %example, so that the same combination can be generated for more than one bundle product.', [
           '%example' => $product->id() . '-F381M-F382M-F1061x3',
         ]),
-        '#default_value' => FALSE,
+        '#default_value' => TRUE,
       ],
     ];
+  }
+
+  /**
+   * Clears #required throughout a form subtree.
+   *
+   * @param array $element
+   *   The element to walk, by reference.
+   */
+  private function clearRequired(array &$element): void {
+    if (isset($element['#required'])) {
+      $element['#required'] = FALSE;
+    }
+    foreach (Element::children($element) as $key) {
+      $this->clearRequired($element[$key]);
+    }
+  }
+
+  /**
+   * Builds the title generation options.
+   *
+   * The format itself is not editable here: it belongs to the variation type
+   * and the bundle item type, which is where it is configured and where it has
+   * to live for VariationBundle::generateTitle() to keep applying it every
+   * time a bundle is saved. This only chooses whether to name the generated
+   * variations that way at all, and shows what the result will look like.
+   *
+   * @param \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type
+   *   The variation type the bundles are created as.
+   *
+   * @return array
+   *   The details element.
+   */
+  private function buildTitleOptions(ProductVariationTypeInterface $variation_type): array {
+    $separator = $variation_type->getThirdPartySetting('commerce_variation_bundle', 'title_separator') ?? VariationBundleInterface::DEFAULT_TITLE_SEPARATOR;
+    $example = $this->t('1x First item@separator2x Second item', ['@separator' => $separator]);
+
+    $element = [
+      '#type' => 'details',
+      '#tree' => TRUE,
+      '#title' => $this->t('Title generation'),
+      '#weight' => -9,
+      '#open' => FALSE,
+    ];
+
+    if ($variation_type->shouldGenerateTitle()) {
+      $element['#description'] = $this->t('This variation type generates its own titles, so every bundle is named after the items it holds: %example. The format cannot be overridden here - it is reapplied every time a bundle is saved. Change it on the <a href=":url">variation type</a>.', [
+        '%example' => $example,
+        ':url' => $variation_type->toUrl('edit-form')->toString(),
+      ]);
+
+      return $element;
+    }
+
+    $element['#description'] = $this->t('Names each generated variation after the items it holds: %example.', [
+      '%example' => $example,
+    ]);
+    $element['generate'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Generate the title from the bundle contents'),
+      '#description' => $this->t('Leave this off to give every generated variation the title entered below.'),
+      '#default_value' => FALSE,
+    ];
+
+    // Overridable only here. This variation type does not generate titles, so
+    // what is written now is what the variations keep - nothing recomputes it
+    // on a later save. The defaults come from the variation type and the
+    // bundle item type, so leaving them alone matches the rest of the site.
+    $visible = [
+      '#states' => ['visible' => [':input[name="title_options[generate]"]' => ['checked' => TRUE]]],
+    ];
+
+    $element['item_pattern'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Item pattern'),
+      '#description' => $this->t('How one item is named. Use @quantity and @title. Applies to this run only; the <a href=":url">bundle item type</a> holds the default.', [
+        '@quantity' => '@quantity',
+        '@title' => '@title',
+        ':url' => Url::fromRoute('entity.commerce_bundle_item_type.collection')->toString(),
+      ]),
+      '#default_value' => $this->itemTitlePattern(),
+      '#size' => 24,
+    ] + $visible;
+
+    $element['separator'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Separator'),
+      '#description' => $this->t('Placed between the items. Applies to this run only; the <a href=":url">variation type</a> holds the default.', [
+        ':url' => $variation_type->toUrl('edit-form')->toString(),
+      ]),
+      '#default_value' => $separator,
+      '#size' => 8,
+    ] + $visible;
+
+    return $element;
+  }
+
+  /**
+   * The default bundle item title pattern.
+   *
+   * @return string
+   *   The pattern configured on the bundle item type the generator creates
+   *   items as.
+   */
+  private function itemTitlePattern(): string {
+    /** @var \Drupal\commerce_variation_bundle\Entity\BundleItemTypeInterface|null $type */
+    $type = $this->entityTypeManager
+      ->getStorage('commerce_bundle_item_type')
+      ->load('default');
+
+    return $type?->getTitlePattern() ?: BundleItemTypeInterface::DEFAULT_TITLE_PATTERN;
   }
 
   /**
@@ -318,7 +463,7 @@ final class GenerateBundleVariationsForm extends FormBase {
    *   The summary render element.
    */
   private function buildSummary(FormStateInterface $form_state): array {
-    $total = $this->countCombinations($this->getSourceSelection($form_state));
+    $total = $this->countCombinations($form_state, $this->getSourceSelection($form_state));
 
     return [
       '#type' => 'container',
@@ -360,8 +505,21 @@ final class GenerateBundleVariationsForm extends FormBase {
     $product_id = $form_state->getValue(['sources', 'add']);
     $product_ids = $form_state->get('source_product_ids');
 
+    /** @var \Drupal\commerce_product\Entity\ProductInterface|null $source */
+    $source = $product_id
+      ? $this->entityTypeManager->getStorage('commerce_product')->load($product_id)
+      : NULL;
+
     if ($product_id && (string) $product_id === (string) $form_state->get('product_id')) {
       $this->messenger()->addWarning($this->t('A bundle product cannot be combined with itself.'));
+    }
+    elseif ($source && $this->getBundleVariationType($source)) {
+      // A bundle of bundles multiplies out the inner combinations as well, and
+      // the split, pricing and stock handling all assume a bundle item points
+      // at a plain variation.
+      $this->messenger()->addWarning($this->t('@label is a bundle product and cannot be used as a source.', [
+        '@label' => $source->label(),
+      ]));
     }
     elseif ($product_id && !in_array($product_id, $product_ids)) {
       $product_ids[] = $product_id;
@@ -409,6 +567,15 @@ final class GenerateBundleVariationsForm extends FormBase {
     // constraints (e.g. NotNull on price) have actual values when validated.
     $variation = $form_state->get('variation');
     $form_display = $form_state->get('form_display');
+
+    // A generated title is built per variation, so the one on the template is
+    // never used. Dropping the component keeps its required constraint from
+    // failing a form whose title field is hidden, and keeps submitForm() from
+    // copying it onto the generated variations.
+    if (!empty($form_state->getValue(['title_options', 'generate']))) {
+      $form_display->removeComponent('title');
+    }
+
     $form_display->extractFormValues($variation, $form, $form_state);
     $form_display->validateFormValues($variation, $form, $form_state);
 
@@ -425,7 +592,7 @@ final class GenerateBundleVariationsForm extends FormBase {
       }
     }
 
-    $total = $this->countCombinations($this->getSourceSelection($form_state));
+    $total = $this->countCombinations($form_state, $this->getSourceSelection($form_state));
     if ($total > self::COMBINATION_LIMIT) {
       $form_state->setErrorByName('sources', $this->t('The current selection would generate @total bundle variations, more than the limit of @limit. Clear some variations and generate the rest in a second run.', [
         '@total' => $total,
@@ -442,6 +609,7 @@ final class GenerateBundleVariationsForm extends FormBase {
     $form_display = $form_state->get('form_display');
     $variation_type_id = $form_state->get('variation_type_id');
     $sku_options = $form_state->getValue('sku_options');
+    $title_options = $form_state->getValue('title_options') ?? [];
 
     // Pull submitted field values into the template variation entity.
     $form_display->extractFormValues($variation, $form, $form_state);
@@ -450,124 +618,53 @@ final class GenerateBundleVariationsForm extends FormBase {
       ->getStorage('commerce_product')
       ->load($form_state->get('product_id'));
 
-    $variation_storage = $this->variationStorage();
-    $bundle_item_storage = $this->entityTypeManager->getStorage('commerce_bundle_item');
-
     $selection = $this->getSourceSelection($form_state);
-    if ($this->countCombinations($selection) === 0) {
+    // The raw count, deliberately: an empty selection is the user's problem to
+    // fix, while a subscriber emptying it is reported further down.
+    if (!$this->variationGenerator->buildCombinations($selection)) {
       $this->messenger()->addError($this->t('No enabled variations found for the selected products.'));
       return;
     }
 
-    $field_names = array_keys($form_display->getComponents());
-    $combinations = $this->cartesianProduct(array_map(
-      // One entry per variation, each carrying its product's quantity, so that
-      // a combination knows how many units of each variation it holds.
-      fn(array $source) => array_map(
-        fn(ProductVariationInterface $source_variation) => [
-          'variation' => $source_variation,
-          'quantity' => $source['quantity'],
-        ],
-        array_values($source['variations']),
-      ),
-      $selection,
-    ));
+    $result = $this->variationGenerator->generate($product, $selection, [
+      'variation_type' => $variation_type_id,
+      'template' => $variation,
+      'fields' => array_keys($form_display->getComponents()),
+      'sku' => $sku_options,
+      'title' => $title_options,
+    ]);
 
-    $created = 0;
-    $skipped = 0;
-
-    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface $variation_type */
-    $variation_type = $this->entityTypeManager->getStorage('commerce_product_variation_type')->load($variation_type_id);
-    $auto_title = $variation_type && $variation_type->shouldGenerateTitle();
-
-    foreach ($combinations as $combo) {
-      $sku = $this->buildSku($combo, $sku_options, $product);
-
-      if ($variation_storage->loadBySku($sku)) {
-        $skipped++;
-        continue;
-      }
-
-      // Create a BundleItem entity for every variation in this combination.
-      $bundle_items = [];
-      foreach ($combo as $item) {
-        $bundle_item = $bundle_item_storage->create([
-          'bundle' => 'default',
-          'variation' => $item['variation']->id(),
-          'quantity' => $item['quantity'],
-          'status' => 1,
-        ]);
-        $bundle_item->save();
-        $bundle_items[] = ['target_id' => $bundle_item->id()];
-      }
-
-      // Create the bundle variation and copy template field values.
-      $new_variation = $variation_storage->create(['type' => $variation_type_id]);
-      foreach ($field_names as $field_name) {
-        if ($field_name === 'title' && $auto_title) {
-          continue;
-        }
-        if ($new_variation->hasField($field_name)) {
-          $new_variation->set($field_name, $variation->get($field_name)->getValue());
-        }
-      }
-      $new_variation->set('sku', $sku);
-      $new_variation->set('bundle_items', $bundle_items);
-      $new_variation->save();
-
-      $product->addVariation($new_variation);
-      $created++;
+    $created = $result->getCreatedCount();
+    if ($created === 0 && $result->getDuplicateCount() === 0 && $result->getSkippedCount() === 0) {
+      $this->messenger()->addWarning($this->t('No bundle variations were generated: every combination was filtered out.'));
     }
-
-    $product->save();
-
     if ($created > 0) {
       $this->messenger()->addMessage(
         $this->formatPlural($created, 'Generated 1 bundle variation.', 'Generated @count bundle variations.')
       );
     }
-    if ($skipped > 0) {
+
+    $duplicates = $result->getDuplicateCount();
+    if ($duplicates > 0) {
       $message = empty($sku_options['include_quantities'])
-        ? $this->formatPlural($skipped, 'Skipped 1 variation with a duplicate SKU. Enable "Include the quantities" under SKU generation to bundle the same variations again in different amounts.', 'Skipped @count variations with duplicate SKUs. Enable "Include the quantities" under SKU generation to bundle the same variations again in different amounts.')
-        : $this->formatPlural($skipped, 'Skipped 1 variation with a duplicate SKU.', 'Skipped @count variations with duplicate SKUs.');
+        ? $this->formatPlural($duplicates, 'Skipped 1 variation with a duplicate SKU. Enable "Include the quantities" under SKU generation to bundle the same variations again in different amounts.', 'Skipped @count variations with duplicate SKUs. Enable "Include the quantities" under SKU generation to bundle the same variations again in different amounts.')
+        : $this->formatPlural($duplicates, 'Skipped 1 variation with a duplicate SKU.', 'Skipped @count variations with duplicate SKUs.');
       $this->messenger()->addWarning($message);
+    }
+
+    // Combinations a subscriber removed are not reported: it made a decision
+    // on the site's behalf and does not need telling. Only the ones it built
+    // and then skipped are, since those look like they should have appeared.
+    $skipped = $result->getSkippedCount();
+    if ($skipped > 0) {
+      $this->messenger()->addWarning(
+        $this->formatPlural($skipped, 'Skipped 1 variation.', 'Skipped @count variations.')
+      );
     }
 
     $form_state->setRedirect('entity.commerce_product_variation.collection', [
       'commerce_product' => $product->id(),
     ]);
-  }
-
-  /**
-   * Builds the SKU of one generated bundle variation.
-   *
-   * @param array[] $combo
-   *   One combination, each element having a "variation" and a "quantity".
-   * @param array $sku_options
-   *   The submitted sku_options values.
-   * @param \Drupal\commerce_product\Entity\ProductInterface $product
-   *   The bundle product the variation is generated for.
-   *
-   * @return string
-   *   The SKU, truncated to the 255 characters the field holds.
-   */
-  private function buildSku(array $combo, array $sku_options, ProductInterface $product): string {
-    $parts = [];
-    foreach ($combo as $item) {
-      $part = $item['variation']->getSku();
-      // A quantity of one is the norm and adds nothing but noise, so only
-      // multiples are spelled out.
-      if (!empty($sku_options['include_quantities']) && $item['quantity'] > 1) {
-        $part .= 'x' . $item['quantity'];
-      }
-      $parts[] = $part;
-    }
-
-    if (!empty($sku_options['include_product_id'])) {
-      array_unshift($parts, $product->id());
-    }
-
-    return substr(implode('-', $parts), 0, 255);
   }
 
   /**
@@ -640,14 +737,21 @@ final class GenerateBundleVariationsForm extends FormBase {
   /**
    * Returns how many combinations a selection produces.
    */
-  private function countCombinations(array $selection): int {
-    if (!$selection) {
+  private function countCombinations(FormStateInterface $form_state, array $selection): int {
+    $product = $this->entityTypeManager
+      ->getStorage('commerce_product')
+      ->load($form_state->get('product_id'));
+
+    if (!$product instanceof ProductInterface) {
       return 0;
     }
 
-    // A product contributing no variations makes the whole product zero, which
-    // is right: a combination has to draw one variation from every product.
-    return array_product(array_map(fn(array $source) => count($source['variations']), $selection));
+    // The count subscribers leave behind, not the raw arithmetic: the summary
+    // would otherwise promise variations that are never created, and the limit
+    // below would refuse a run a subscriber had already cut to size.
+    return count($this->variationGenerator->getCombinations($product, $selection, [
+      'variation_type' => $form_state->get('variation_type_id'),
+    ]));
   }
 
   /**
@@ -684,29 +788,6 @@ final class GenerateBundleVariationsForm extends FormBase {
     }
 
     return NULL;
-  }
-
-  /**
-   * Returns the cartesian product of an array of arrays.
-   *
-   * @param array[] $arrays
-   *   Each inner array is a set of values for one dimension.
-   *
-   * @return array[]
-   *   Every possible combination, one element per inner array.
-   */
-  private function cartesianProduct(array $arrays): array {
-    $result = [[]];
-    foreach ($arrays as $array) {
-      $new_result = [];
-      foreach ($result as $current) {
-        foreach ($array as $item) {
-          $new_result[] = array_merge($current, [$item]);
-        }
-      }
-      $result = $new_result;
-    }
-    return $result;
   }
 
 }

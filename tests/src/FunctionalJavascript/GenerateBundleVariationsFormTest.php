@@ -167,7 +167,9 @@ class GenerateBundleVariationsFormTest extends CommerceWebDriverTestBase {
       $this->loadGeneratedVariations(),
     );
     sort($sku_list);
-    $this->assertEquals(['HAT-S-SCARF-BLUEx2', 'HAT-S-SCARF-REDx2'], $sku_list);
+    // "Include the parent product ID" is on by default.
+    $prefix = $this->bundleProduct->id() . '-';
+    $this->assertEquals([$prefix . 'HAT-S-SCARF-BLUEx2', $prefix . 'HAT-S-SCARF-REDx2'], $sku_list);
   }
 
   /**

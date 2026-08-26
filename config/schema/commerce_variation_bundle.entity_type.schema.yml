@@ -13,3 +13,14 @@ commerce_variation_bundle.commerce_bundle_item_type.*:
     generateTitle:
       type: boolean
       label: 'Generate bundle item titles based on product variation'
+    titlePattern:
+      type: label
+      label: 'Pattern a generated bundle item title is built from'
+
+commerce_product.commerce_product_variation_type.*.third_party.commerce_variation_bundle:
+  type: mapping
+  label: 'Variation bundle settings'
+  mapping:
+    title_separator:
+      type: label
+      label: 'Placed between the bundle items of a generated title'

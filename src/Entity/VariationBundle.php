@@ -64,7 +64,13 @@ class VariationBundle extends ProductVariation implements VariationBundleInterfa
       return $bundle_item->getTitle();
     }, $bundle_items);
 
-    $title = implode(' / ', $title);
+    /** @var \Drupal\commerce_product\Entity\ProductVariationTypeInterface|null $variation_type */
+    $variation_type = $this->entityTypeManager()
+      ->getStorage('commerce_product_variation_type')
+      ->load($this->bundle());
+    $separator = $variation_type?->getThirdPartySetting('commerce_variation_bundle', 'title_separator') ?? VariationBundleInterface::DEFAULT_TITLE_SEPARATOR;
+
+    $title = implode($separator, $title);
 
     // If the title is longer than 255 characters, fallback to default title.
     if (strlen($title) > 255) {
